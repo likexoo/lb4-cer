@@ -8,5 +8,13 @@
         "prepublish": "tsc"
     },
     "author": "likexoo",
-    "license": "MIT"
+    "license": "MIT",
+    "dependencies": {
+        "@loopback/context": "^3.8.1",
+        "@loopback/core": "^2.7.0",
+        "@loopback/rest": "^5.0.1",
+        "@types/bson": "^4.0.2",
+        "bson": "^4.0.4",
+        "node-cache": "^5.1.0"
+    }
 }

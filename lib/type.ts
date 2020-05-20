@@ -1,5 +1,5 @@
 import { Request } from '@loopback/rest';
-import { ObjectId } from 'mongodb';
+import { ObjectId } from 'bson';
 import { AnyObject } from '@loopback/repository';
 
 // *********************

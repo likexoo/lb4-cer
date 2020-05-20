@@ -4,7 +4,6 @@ import NodeCache = require('node-cache');
 import { ExpectFunction, CerSpec, ExpectFunctionReport, CerPackageCached, CerTokenMetadata, CerEntity, CerDefinition } from './type';
 import { CoreBindings } from '@loopback/core';
 import { CerBindings } from './binding';
-import { ObjectId } from 'mongodb';
 
 export class ExpectFunctionProvider implements Provider<ExpectFunction> {
 
