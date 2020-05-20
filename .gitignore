@@ -1,2 +1,5 @@
 # Transpiled JavaScript files from Typescript
 /dist
+
+# Dependency directories
+node_modules/
