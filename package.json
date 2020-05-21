@@ -1,6 +1,6 @@
 {
     "name": "lb4-cer",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "A LoopBack component for permission authentication support.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
