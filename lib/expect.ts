@@ -65,7 +65,7 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
         let report: ExpectFunctionReport = {};
         // get owned cers
         let cersOwned: Array<CerEntity> | null = cerPackageCached && Array.isArray(cerPackageCached.cers) ? cerPackageCached.cers : cersFound;
-        if (!Array.isArray(cersOwned)) throw { message: 'Owned certificates is invalid.', status: 401 };
+        if (!Array.isArray(cersOwned)) throw { message: 'Owned certificates not found or is invalid.', status: 401 };
         // iterate over all situations
         Object.keys(metdata).forEach((situation: string) => {
             // init

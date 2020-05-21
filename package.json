@@ -1,7 +1,7 @@
 {
     "name": "lb4-cer",
-    "version": "1.0.3",
-    "description": "",
+    "version": "1.0.4",
+    "description": "A LoopBack component for permission authentication support.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "type": "module",
@@ -19,5 +19,13 @@
         "README.md",
         "dist",
         "lib"
-    ]
+    ],
+    "keywords": [
+        "LoopBack",
+        "Authentication"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/likexoo/lb4-cer.git"
+    }
 }
