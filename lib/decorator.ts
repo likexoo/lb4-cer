@@ -1,3 +1,4 @@
+// @ts-ignore comment
 import { MethodDecoratorFactory } from '@loopback/metadata';
 import { CerSpec } from './type';
 import { CerBindings } from './binding';

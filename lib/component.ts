@@ -1,4 +1,6 @@
+// @ts-ignore comment
 import { Component, Binding, inject, BindingScope } from '@loopback/core';
+// @ts-ignore comment
 import NodeCache = require('node-cache');
 import { CerBindings } from './binding';
 import { ExpectFunctionProvider } from './expect';

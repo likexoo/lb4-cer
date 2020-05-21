@@ -1,6 +1,8 @@
+// @ts-ignore comment
 import { BindingKey } from '@loopback/context';
-import { ExpectFunction, CerSpec, CerDefinition } from './type';
+// @ts-ignore comment
 import NodeCache = require('node-cache');
+import { ExpectFunction, CerSpec, CerDefinition } from './type';
 
 export const CerBindings = {
     // external bindings

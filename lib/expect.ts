@@ -1,9 +1,13 @@
+// @ts-ignore comment
 import { Provider, ValueOrPromise, MetadataInspector, inject, Constructor } from '@loopback/context';
+// @ts-ignore comment
 import { Request } from '@loopback/rest';
+// @ts-ignore comment
 import NodeCache = require('node-cache');
-import { ExpectFunction, CerSpec, ExpectFunctionReport, CerPackageCached, CerTokenMetadata, CerEntity, CerDefinition } from './type';
+// @ts-ignore comment
 import { CoreBindings } from '@loopback/core';
 import { CerBindings } from './binding';
+import { ExpectFunction, CerSpec, ExpectFunctionReport, CerPackageCached, CerTokenMetadata, CerEntity, CerDefinition } from './type';
 
 export class ExpectFunctionProvider implements Provider<ExpectFunction> {
 
@@ -22,7 +26,7 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
     }
 
     value(): ValueOrPromise<ExpectFunction> {
-        return (request, tokenMetaData, sequenceMetaData) => this.action(request, tokenMetaData, sequenceMetaData);
+        return (request: Request, tokenMetaData: CerTokenMetadata, sequenceMetaData: any) => this.action(request, tokenMetaData, sequenceMetaData);
     }
 
     async action(

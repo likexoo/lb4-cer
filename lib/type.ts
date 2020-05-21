@@ -1,5 +1,8 @@
+// @ts-ignore comment
 import { Request } from '@loopback/rest';
+// @ts-ignore comment
 import { ObjectId } from 'bson';
+// @ts-ignore comment
 import { AnyObject } from '@loopback/repository';
 
 // *********************
