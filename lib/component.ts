@@ -1,20 +1,18 @@
 // @ts-ignore comment
-import { Component, Binding, inject, BindingScope } from '@loopback/core';
+import { Component, Binding, BindingScope } from '@loopback/core';
 // @ts-ignore comment
 import NodeCache = require('node-cache');
 import { CerBindings } from './binding';
 import { ExpectFunctionProvider } from './expect';
-import { CerDefinition } from './type';
+import { UpdateFunctionProvider } from './update';
 
 export class CerComponent implements Component {
 
-    constructor(
-        @inject(CerBindings.DEFINITION, { optional: true })
-        private readonly definition: CerDefinition
-    ) { }
+    constructor( ) { }
 
     public bindings = [
         new Binding(CerBindings.EXPECT_FUNCTION).toProvider(ExpectFunctionProvider),
+        new Binding(CerBindings.UPDATE_FUNCTION).toProvider(UpdateFunctionProvider),
         new Binding(CerBindings.NODE_CACHE).to(new NodeCache()).inScope(BindingScope.SINGLETON)
     ];
 

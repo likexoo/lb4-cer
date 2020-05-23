@@ -4,6 +4,11 @@ A LoopBack component for permission authentication support.
 
 This module is NOT ready for widespread use, and is currently only used by the developer's company.
 
+## Basic concepts
+
+- `Certificate` - Carrier of authority, stored in database.
+- `Strategy Class` - Class has function that return certificates according to the request and metadata in sequence.
+
 ## How to use
 
 Step 1: Create Definition
@@ -16,12 +21,14 @@ export const Definition: CerDefinition = {
     },
     strategy: <Your_Strategy_Class>,
     cerExamples: {
-        '00': {
-            a: true
+        'BOSS_PERMISSION': {
+            CREATE_STAFF: true,
+            READ_STAFF: true,
+            UPDATE_STAFF: true,
+            UPDATE_STAFF: true
         },
-        '01': {
-            a: true,
-            b: true
+        'ADMIN_PERMISSION': {
+            UPDATE_EVERYTHING: true
         }
         // ...
     }
@@ -52,6 +59,38 @@ export class DefaultSequence implements SequenceHandler {
 
     async handle(context: RequestContext) {
         const cerReport: ExpectFunctionReport | undefined = await (await this.expectFunction())(request);
+        // ...
+    }
+
+}
+
+```
+
+Step 4: Using @cer In Your Controller
+
+```ts
+// xxx.controller.ts
+
+export class TestController {
+
+    constructor( ) { }
+
+    @cer(
+        {
+            situation0: {
+                'BOSS_PERMISSION': {
+                    UPDATE_STAFF: true
+                }
+            },
+            situation1: {
+                'ADMIN_PERMISSION': {
+                    UPDATE_EVERYTHING: true
+                }
+            }
+        }
+    )
+    @patch('/v1/staff')
+    async updateOneStaff() {
         // ...
     }
 

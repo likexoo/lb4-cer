@@ -57,8 +57,16 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
         // find cer source in db
         let cersFound: Array<CerEntity> | null = null;
         if (this.definition.options.cerSource === 'DB' || (!cerPackageCached && this.definition.options.cerSource === 'CACHE_THEN_DB')) {
-            const findCersResult = await this.definition.strategy.findCers(tokenMetaData, sequenceMetaData);
-            if (findCersResult && Array.isArray(findCersResult)) cersFound = findCersResult;
+            const findCersResult = await this.definition.strategy.findCers(request, tokenMetaData, sequenceMetaData);
+            if (findCersResult && Array.isArray(findCersResult)) {
+                cersFound = findCersResult;
+                // store in cache
+                this.nodeCache.set(`${tokenMetaData._id}`, {
+                    _id: `${tokenMetaData._id}`,
+                    timestamp: new Date().toISOString(),
+                    cers: cersFound
+                })
+            }
         }
         // $ expect cers
         // init

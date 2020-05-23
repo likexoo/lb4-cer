@@ -22,18 +22,20 @@ export type CerDefinition = {
 // *********************
 
 export type CerTokenMetadata = {
-    _id: ObjectId;
+    _id: string | ObjectId;
     cerTimestamp: string;
 } & AnyObject;
 
 export interface CerStrategy {
 
     findCers(
+        request: Request,
         tokenMetaData: CerTokenMetadata | undefined,
         sequenceData: any | undefined
     ): Promise<Array<CerEntity>>;
 
     findCersTimestamp(
+        request: Request,
         tokenMetaData: CerTokenMetadata | undefined,
         sequenceData: any | undefined
     ): Promise<Date>;
@@ -43,6 +45,11 @@ export interface CerStrategy {
 // *********************
 // Function
 // *********************
+
+export type UpdateFunction = (
+    _id: string | ObjectId,
+    cers: Array<CerEntity>
+) => Promise<void>;
 
 export type ExpectFunction = (
     request: Request,
@@ -63,7 +70,7 @@ export type ExpectFunctionReport = {
 // *********************
 
 export interface CerEntity {
-    _id?: ObjectId;
+    _id?: string | ObjectId;
     package?: keyof CerPackageExamples;
     contains?: { [key: string]: boolean };
     relateds?: { [key: string]: string | ObjectId };
@@ -76,7 +83,7 @@ export type CerPackageExamples = {
 };
 
 export type CerPackageCached = {
-    _id: ObjectId;
+    _id: string | ObjectId;
     timestamp: string;
     cers: Array<CerEntity>;
 };
