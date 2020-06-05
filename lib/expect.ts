@@ -1,10 +1,6 @@
-// @ts-ignore comment
 import { Provider, ValueOrPromise, MetadataInspector, inject, Constructor } from '@loopback/context';
-// @ts-ignore comment
 import { Request } from '@loopback/rest';
-// @ts-ignore comment
 import NodeCache = require('node-cache');
-// @ts-ignore comment
 import { CoreBindings } from '@loopback/core';
 import { CerBindings } from './binding';
 import { ExpectFunction, CerSpec, ExpectFunctionReport, CerPackageCached, CerTokenMetadata, CerEntity, CerDefinition } from './type';
@@ -26,7 +22,7 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
     }
 
     value(): ValueOrPromise<ExpectFunction> {
-        return (request: Request, tokenMetaData: CerTokenMetadata, sequenceMetaData: any) => this.action(request, tokenMetaData, sequenceMetaData);
+        return (request: Request, tokenMetaData: CerTokenMetadata | undefined, sequenceMetaData: any) => this.action(request, tokenMetaData, sequenceMetaData);
     }
 
     async action(
@@ -41,16 +37,13 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
         // init metdata
         metdata.options = metdata.options || {};
         // if token metadata is invalid
-        if (metdata.options.requiredTokenMetadata && (!tokenMetaData || !tokenMetaData._id))
+        if (!tokenMetaData || !tokenMetaData.id)
             throw new Error('Token metadata is invalid.');
         // $ find cer source
         // find cer source in cache
         let cerPackageCached: CerPackageCached | null = null;
-        if (
-            tokenMetaData &&
-            (this.definition.options.cerSource === 'CACHE' || this.definition.options.cerSource === 'CACHE_THEN_DB')
-        ) {
-            const cachedData = this.nodeCache.get<CerPackageCached>(`${tokenMetaData._id}`);
+        if (this.definition.options.cerSource === 'CACHE' || this.definition.options.cerSource === 'CACHE_THEN_DB') {
+            const cachedData = this.nodeCache.get<CerPackageCached>(`${tokenMetaData.id}`);
             // if cached cer exists, check timestamp
             if (cachedData && cachedData.timestamp === tokenMetaData.cerTimestamp) cerPackageCached = cachedData;
         }
@@ -61,8 +54,8 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
             if (findCersResult && Array.isArray(findCersResult)) {
                 cersFound = findCersResult;
                 // store in cache
-                this.nodeCache.set(`${tokenMetaData._id}`, {
-                    _id: `${tokenMetaData._id}`,
+                this.nodeCache.set(`${tokenMetaData.id}`, {
+                    id: `${tokenMetaData.id}`,
                     timestamp: new Date().toISOString(),
                     cers: cersFound
                 })

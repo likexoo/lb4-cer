@@ -1,8 +1,5 @@
-// @ts-ignore comment
 import { Request } from '@loopback/rest';
-// @ts-ignore comment
 import { ObjectId } from 'bson';
-// @ts-ignore comment
 import { AnyObject } from '@loopback/repository';
 
 // *********************
@@ -22,7 +19,7 @@ export type CerDefinition = {
 // *********************
 
 export type CerTokenMetadata = {
-    _id: string | ObjectId;
+    id: string | ObjectId;
     cerTimestamp: string;
 } & AnyObject;
 
@@ -47,7 +44,7 @@ export interface CerStrategy {
 // *********************
 
 export type UpdateFunction = (
-    _id: string | ObjectId,
+    id: string | ObjectId,
     cers: Array<CerEntity>
 ) => Promise<void>;
 
@@ -70,7 +67,7 @@ export type ExpectFunctionReport = {
 // *********************
 
 export interface CerEntity {
-    _id?: string | ObjectId;
+    id?: string | ObjectId;
     package?: keyof CerPackageExamples;
     contains?: { [key: string]: boolean };
     relateds?: { [key: string]: string | ObjectId };
@@ -83,7 +80,7 @@ export type CerPackageExamples = {
 };
 
 export type CerPackageCached = {
-    _id: string | ObjectId;
+    id: string | ObjectId;
     timestamp: string;
     cers: Array<CerEntity>;
 };

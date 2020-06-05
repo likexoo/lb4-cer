@@ -5,16 +5,29 @@
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "tsc"
+        "build": "tsc",
+        "pretest": "find dist -name '*.d.ts' -exec rm {} \\; && tsc",
+        "test": "mocha \"dist/__tests__/**/*.js\"",
+        "acceptance": "mocha \"dist/__tests__/acceptance/**/*.js\"",
+        "unit:expect-function": "mocha \"dist/acceptance/expect-function.acceptance\""
     },
     "author": "likexoo",
     "license": "MIT",
-    "dependencies": { },
+    "dependencies": {},
     "devDependencies": {
-        "@types/node": "^14.0.4",
+        "@loopback/context": "^3.8.2",
+        "@loopback/core": "^2.7.1",
+        "@loopback/metadata": "^2.1.6",
+        "@loopback/openapi-spec-builder": "^2.1.6",
+        "@loopback/repository": "^2.6.0",
+        "@loopback/rest": "^5.1.0",
         "@loopback/testlab": "^3.1.5",
-        "jest": "^26.0.1"
+        "@types/bson": "^4.0.2",
+        "@types/mocha": "^7.0.2",
+        "@types/node": "^14.0.4",
+        "bson": "^4.0.4",
+        "jest": "^26.0.1",
+        "node-cache": "^5.1.0"
     },
     "files": [
         "README.md",
