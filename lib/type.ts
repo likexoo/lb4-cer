@@ -9,7 +9,7 @@ import { AnyObject } from '@loopback/repository';
 export type CerDefinition = {
     options: {
         cerSource: 'CACHE' | 'DB' | 'CACHE_THEN_DB';
-    },
+    };
     strategy: CerStrategy;
     cerExamples: CerPackageExamples;
 };
@@ -50,15 +50,24 @@ export type UpdateFunction = (
 
 export type ExpectFunction = (
     request: Request,
-    tokenMetaData?: CerTokenMetadata,
+    tokenMetaData: CerTokenMetadata,
     sequenceMetaData?: any
 ) => Promise<ExpectFunctionReport | undefined>;
 
 export type ExpectFunctionReport = {
-    [situation: string]: {
-        errors: Array<{ message: string; details: any; }>;
-        passed: boolean;
-        relateds: any;
+    overview: {
+        passedSituations: Array<string>;
+        unpassedSituations: Array<string>;
+        tokenMetaData: CerTokenMetadata,
+        cerSource: 'CACHE' | 'DB' | 'NONE';
+        cers: Array<CerEntity>;
+    };
+    details: {
+        [situation: string]: {
+            errors: Array<{ message: string; details: any; }>;
+            passed: boolean;
+            relateds: any;
+        };
     }
 };
 

@@ -22,61 +22,80 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
     }
 
     value(): ValueOrPromise<ExpectFunction> {
-        return (request: Request, tokenMetaData: CerTokenMetadata | undefined, sequenceMetaData: any) => this.action(request, tokenMetaData, sequenceMetaData);
+        return (request: Request, tokenMetaData: CerTokenMetadata, sequenceMetaData: any) => this.action(request, tokenMetaData, sequenceMetaData);
     }
 
     async action(
         request: Request,
-        tokenMetaData?: CerTokenMetadata,
+        tokenMetaData: CerTokenMetadata,
         sequenceMetaData?: any
     ): Promise<ExpectFunctionReport | undefined> {
+        // $ init
+        let report: ExpectFunctionReport = {
+            overview: {
+                passedSituations: [],
+                unpassedSituations: [],
+                tokenMetaData: tokenMetaData,
+                cerSource: 'NONE',
+                cers: []
+            },
+            details: {}
+        };
         // $ check metadata
         // find metadata
-        const metdata: CerSpec | undefined = MetadataInspector.getMethodMetadata(CerBindings.CER_METADATA, this.controllerClass.prototype, this.methodName);
-        if (!metdata) return;
-        // init metdata
-        metdata.options = metdata.options || {};
+        const metadata: CerSpec | undefined = MetadataInspector.getMethodMetadata(CerBindings.CER_METADATA, this.controllerClass.prototype, this.methodName);
+        if (!metadata) return;
+        // init metadata
+        metadata.options = metadata.options || {};
         // if token metadata is invalid
         if (!tokenMetaData || !tokenMetaData.id)
-            throw new Error('Token metadata is invalid.');
+            throw { message: 'Token metadata is invalid.', statusCode: 401 };
         // $ find cer source
         // find cer source in cache
         let cerPackageCached: CerPackageCached | null = null;
         if (this.definition.options.cerSource === 'CACHE' || this.definition.options.cerSource === 'CACHE_THEN_DB') {
             const cachedData = this.nodeCache.get<CerPackageCached>(`${tokenMetaData.id}`);
             // if cached cer exists, check timestamp
-            if (cachedData && cachedData.timestamp === tokenMetaData.cerTimestamp) cerPackageCached = cachedData;
+            if (cachedData && cachedData.timestamp === tokenMetaData.cerTimestamp) {
+                cerPackageCached = cachedData;
+                report.overview.cerSource = 'CACHE';
+                report.overview.cers = cerPackageCached.cers || [];
+            }
         }
         // find cer source in db
         let cersFound: Array<CerEntity> | null = null;
         if (this.definition.options.cerSource === 'DB' || (!cerPackageCached && this.definition.options.cerSource === 'CACHE_THEN_DB')) {
-            const findCersResult = await this.definition.strategy.findCers(request, tokenMetaData, sequenceMetaData);
-            if (findCersResult && Array.isArray(findCersResult)) {
-                cersFound = findCersResult;
-                // store in cache
-                this.nodeCache.set(`${tokenMetaData.id}`, {
-                    id: `${tokenMetaData.id}`,
-                    timestamp: new Date().toISOString(),
-                    cers: cersFound
-                })
+            // strategy is exists and .findCers() is valid function
+            if (this.definition.strategy && typeof this.definition.strategy.findCers === 'function') {
+                const findCersResult = await this.definition.strategy.findCers(request, tokenMetaData, sequenceMetaData);
+                if (findCersResult && Array.isArray(findCersResult)) {
+                    cersFound = findCersResult;
+                    report.overview.cerSource = 'DB';
+                    report.overview.cers = cersFound || [];
+                    // store in cache
+                    this.nodeCache.set(`${tokenMetaData.id}`, {
+                        id: `${tokenMetaData.id}`,
+                        timestamp: new Date().toISOString(),
+                        cers: cersFound
+                    })
+                }
             }
         }
         // $ expect cers
-        // init
-        let report: ExpectFunctionReport = {};
         // get owned cers
         let cersOwned: Array<CerEntity> | null = cerPackageCached && Array.isArray(cerPackageCached.cers) ? cerPackageCached.cers : cersFound;
-        if (!Array.isArray(cersOwned)) throw { message: 'Owned certificates not found or is invalid.', status: 401 };
+        cersOwned = Array.isArray(cersOwned) ? cersOwned : [];
         // iterate over all situations
-        Object.keys(metdata).forEach((situation: string) => {
+        Object.keys(metadata).forEach((situation: string) => {
             // init
-            const situationObject = metdata[situation];
+            const situationObject = metadata[situation];
+            let relateds: any[] = [];
             // ingore non-cer properties
             if (situation === 'options') return;
             // update report
-            report[situation] = { errors: [], passed: true, relateds: {} };
+            report.details[situation] = { errors: [], passed: true, relateds: {} };
             // iterate over all expected packages
-            Object.keys(metdata[situation]).forEach((packageName: string) => {
+            Object.keys(metadata[situation]).forEach((packageName: string) => {
                 // init
                 const packageObject = situationObject[packageName] || {};
                 cersOwned = cersOwned || [];
@@ -86,8 +105,8 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
                 const index = cersOwned.findIndex(t => t.package === packageName);
                 // if cer not found
                 if (index === -1) {
-                    report[situation].passed = false;
-                    report[situation].errors.push({
+                    report.details[situation].passed = false;
+                    report.details[situation].errors.push({
                         message: `Missing required certificate ${packageName}`,
                         details: {}
                     });
@@ -104,8 +123,8 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
                         packageObject[containName] === true &&
                         (!targetOwnedCer.contains || !targetOwnedCer.contains[containName])
                     ) {
-                        report[situation].passed = false;
-                        report[situation].errors.push({
+                        report.details[situation].passed = false;
+                        report.details[situation].errors.push({
                             message: `Missing required certificate contain ${packageName}.${containName}`,
                             details: {}
                         });
@@ -116,17 +135,27 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
                         packageObject[containName] === false &&
                         (targetOwnedCer.contains && targetOwnedCer.contains[containName])
                     ) {
-                        report[situation].passed = false;
-                        report[situation].errors.push({
+                        report.details[situation].passed = false;
+                        report.details[situation].errors.push({
                             message: `Found excluded certificate contain ${packageName}.${containName}`,
                             details: {}
                         });
                         return;
                     }
                 });
-                // add relateds if passed
-                if (report[situation].passed) Object.assign(report[situation].relateds, targetOwnedCer.relateds || {});
+                // add related
+                if (targetOwnedCer.relateds) relateds.push(targetOwnedCer.relateds);
             });
+            // add relateds
+            report.details[situation].relateds = relateds;
+            // if passed
+            if (report.details[situation].passed) {
+                report.overview.passedSituations.push(situation);
+            }
+            // if not passed
+            else {
+                report.overview.unpassedSituations.push(situation);
+            }
         });
         // $ return
         return report;
