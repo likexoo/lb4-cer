@@ -1,8 +1,9 @@
 import { createRestAppClient, supertest, expect } from '@loopback/testlab';
 import { ExpectFunctionMain } from '../fixtures/expect-function-application';
 import { ExpectFunctionApplication } from '../fixtures/expect-function-application/application';
-import { CerPackageCached, CerTokenMetadata } from '../../lib/type';
+import { CerPackageCached, CerTokenMetadata, CerStrategy, CerEntity } from '../../lib/type';
 import { CerHelper } from '../helpers/cer.helper';
+import { Request } from '@loopback/rest';
 import _ from 'lodash';
 import { SpyHelper } from '../helpers/spy.helper';
 
@@ -217,6 +218,130 @@ describe('ExpectFunction', () => {
         const result5 = await client.get('/test3');
         expect(result5).propertyByPath('status').eql(200);
         expect(result5).propertyByPath('body', 'cerReport', 'overview', 'cerSource').eql('CACHE');
+        expect(result5).propertyByPath('body', 'cerReport', 'overview', 'passedSituations', 'length').eql(0);
+        expect(result5).propertyByPath('body', 'cerReport', 'details', 'situation0', 'passed').eql(false);
+        expect(result5).propertyByPath('body', 'cerReport', 'details', 'situation1', 'passed').eql(false);
+
+    });
+
+    it(`expect multiple situations with options.cerSource = 'DB'`, async () => {
+
+        const timestamp = `${new Date().toISOString()}`;
+        await cerHelper.updateCerDefintion('options.cerSource', 'DB');
+
+        // having the required cers
+
+        class TestStrategy1 {
+
+            public async findCers(
+                request: Request,
+                tokenMetaData: CerTokenMetadata | undefined,
+                sequenceData: any | undefined
+            ): Promise<Array<CerEntity>> {
+                return [
+                    {
+                        id: '1000',
+                        package: 'BOSS_PERMISSION',
+                        contains: {
+                            UPDATE_STAFF: true
+                        }
+                    }
+                ];
+            }
+        
+        }
+        await cerHelper.updateCerDefintion('strategy', new TestStrategy1());
+        spyHelper.upsertSpyFunction(
+            'sequence.beforeInvoke',
+            async () => {
+                return {
+                    id: 'TEST_USER_ID',
+                    cerTimestamp: timestamp
+                } as CerTokenMetadata
+            }
+        );
+
+        const result1 = await client.get('/test3');
+        expect(result1).propertyByPath('status').eql(200);
+        expect(result1).propertyByPath('body', 'cerReport', 'overview', 'cerSource').eql('DB');
+        expect(result1).propertyByPath('body', 'cerReport', 'overview', 'passedSituations', 'length').eql(1);
+        expect(result1).propertyByPath('body', 'cerReport', 'details', 'situation0', 'passed').eql(true);
+        expect(result1).propertyByPath('body', 'cerReport', 'details', 'situation1', 'passed').eql(false);
+
+        // not having the required cers (contains not match)
+
+        class TestStrategy2 {
+
+            public async findCers(
+                request: Request,
+                tokenMetaData: CerTokenMetadata | undefined,
+                sequenceData: any | undefined
+            ): Promise<Array<CerEntity>> {
+                return [
+                    {
+                        id: '1000',
+                        package: 'BOSS_PERMISSION',
+                        contains: {
+                            OTHERS: true
+                        }
+                    }
+                ];
+            }
+        
+        }
+        await cerHelper.updateCerDefintion('strategy', new TestStrategy2());
+        spyHelper.upsertSpyFunction(
+            'sequence.beforeInvoke',
+            async () => {
+                return {
+                    id: 'TEST_USER_ID',
+                    cerTimestamp: timestamp
+                } as CerTokenMetadata
+            }
+        );
+
+        const result2 = await client.get('/test3');
+        expect(result2).propertyByPath('status').eql(200);
+        expect(result2).propertyByPath('body', 'cerReport', 'overview', 'cerSource').eql('DB');
+        expect(result2).propertyByPath('body', 'cerReport', 'overview', 'passedSituations', 'length').eql(0);
+        expect(result2).propertyByPath('body', 'cerReport', 'details', 'situation0', 'passed').eql(false);
+        expect(result2).propertyByPath('body', 'cerReport', 'details', 'situation1', 'passed').eql(false);
+
+        // not having the required cers (package not match)
+
+        class TestStrategy5 {
+
+            public async findCers(
+                request: Request,
+                tokenMetaData: CerTokenMetadata | undefined,
+                sequenceData: any | undefined
+            ): Promise<Array<CerEntity>> {
+                return [
+                    {
+                        id: '1000',
+                        package: 'OTHERS',
+                        contains: {
+                            UPDATE_STAFF: true
+                        }
+                    }
+                ];
+            }
+        
+        }
+        await cerHelper.updateCerDefintion('strategy', new TestStrategy5());
+        spyHelper.upsertSpyFunction(
+            'sequence.beforeInvoke',
+            async () => {
+                return {
+                    id: 'TEST_USER_ID',
+                    cerTimestamp: timestamp
+                } as CerTokenMetadata
+            }
+        );
+
+        const result5 = await client.get('/test3');
+        expect(result5).propertyByPath('status').eql(200);
+        expect(result5).propertyByPath('body', 'cerReport', 'overview', 'cerSource').eql('DB');
         expect(result5).propertyByPath('body', 'cerReport', 'overview', 'passedSituations', 'length').eql(0);
         expect(result5).propertyByPath('body', 'cerReport', 'details', 'situation0', 'passed').eql(false);
         expect(result5).propertyByPath('body', 'cerReport', 'details', 'situation1', 'passed').eql(false);
