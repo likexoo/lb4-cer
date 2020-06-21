@@ -1,7 +1,7 @@
 {
-    "name": "lb4-cer",
-    "version": "1.0.7",
-    "description": "A LoopBack component for permission authentication support.",
+    "name": "lb4-credential-auth",
+    "version": "1.1.0",
+    "description": "A LoopBack4 component for credential authentication support.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "scripts": {
@@ -39,10 +39,12 @@
     ],
     "keywords": [
         "LoopBack",
-        "Authentication"
+        "Authentication",
+        "Credential",
+        "Credential Authentication"
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/likexoo/lb4-cer.git"
+        "url": "https://github.com/likexoo/lb4-credential-auth"
     }
 }
