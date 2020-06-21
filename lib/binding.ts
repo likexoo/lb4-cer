@@ -1,13 +1,22 @@
 import { BindingKey } from '@loopback/context';
 import NodeCache = require('node-cache');
-import { ExpectFunction, CerSpec, CerDefinition, UpdateFunction } from './type';
+import { ExpectFunction, Definition } from './type';
+import { CredentialCodeSpec, CredentialPointSpec, CredentialRelevanceSpec } from './types/credential.type';
+import { CredentialAuthSpec } from './types/credential-auth.type';
+import { CredentialService } from './services/credential.service';
 
-export const CerBindings = {
+export const CredentialAuthBindings = {
+    // metadatas
+    CERDENTIALS_CODE_METADATA: BindingKey.create<CredentialCodeSpec>('module.credentialAuth.codeMetadata'),
+    CERDENTIALS_POINT_METADATA: BindingKey.create<CredentialPointSpec>('module.credentialAuth.pointMetadata'),
+    CERDENTIALS_RELEVANCE_METADATA: BindingKey.create<CredentialRelevanceSpec>('module.credentialAuth.relevanceMetadata'),
+    CREDENTIAL_AUTH_METADATA: BindingKey.create<CredentialAuthSpec>('module.credentialAuth.credentialAuthMetadata'),
+    // services
+    SERVICE: BindingKey.create<CredentialService>('module.credentialAuth.service'),
     // external bindings
-    DEFINITION: BindingKey.create<CerDefinition>('module.cer.definition'),
+    DEFINITION: BindingKey.create<Definition>('module.credentialAuth.definition'),
     // internal bindings
-    EXPECT_FUNCTION: BindingKey.create<ExpectFunction>('module.cer.expectFunction'),
-    UPDATE_FUNCTION: BindingKey.create<UpdateFunction>('module.cer.updateFunction'),
-    CER_METADATA: BindingKey.create<CerSpec>('module.cer.cerMetadata'),
-    NODE_CACHE: BindingKey.create<NodeCache>('module.cer.nodeCache')
+    EXPECT_FUNCTION: BindingKey.create<ExpectFunction>('module.credentialAuth.expectFunction'),
+    // UPDATE_FUNCTION: BindingKey.create<UpdateFunction>('module.credentialAuth.updateFunction'),
+    NODE_CACHE: BindingKey.create<NodeCache>('module.credentialAuth.nodeCache')
 };

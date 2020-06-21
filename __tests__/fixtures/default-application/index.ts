@@ -1,7 +1,7 @@
 import { ApplicationConfig } from '@loopback/core';
 import { ExpectFunctionApplication } from './application';
 
-export async function ExpectFunctionMain(options: ApplicationConfig = {
+export async function DefaultMain(options: ApplicationConfig = {
     shutdown: { signals: ['SIGINT'] }
 }) {
 

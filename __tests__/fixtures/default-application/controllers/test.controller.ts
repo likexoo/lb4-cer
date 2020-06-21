@@ -1,24 +1,29 @@
 import { get } from "@loopback/rest";
-import { cer } from "../../../../index";
+import { cauth } from "../../../../index";
 
 export class ExpectFunctionController {
     constructor() { }
 
-    @cer({ s: {} })
+    @cauth({ s: {} })
     @get('/test1')
-    async test1(): Promise<void> { }
+    async test1(): Promise<string> {
+        return 'ok';
+    }
 
     @get('/test2')
-    async test2(): Promise<void> { }
+    async test2(): Promise<string> {
+        return 'ok';
+    }
 
-    @cer({
+    @cauth({
         situation0: {
-            'BOSS_PERMISSION': {
-                UPDATE_STAFF: true
+            'MANAGER': {
+                UPDATE_STAFF: true,
+                LEVEL: (val: number) => val >= 2
             }
         },
         situation1: {
-            'ADMIN_PERMISSION': {
+            'ADMIN': {
                 UPDATE_EVERYTHING: true
             }
         }

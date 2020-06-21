@@ -1,11 +1,11 @@
-import { CerBindings, ExpectFunctionReport, cer, ExpectFunction, CerComponent } from '../../../index';
+import { CredentialAuthBindings, CredentialAuthComponent } from '../../../index';
 import { BootMixin } from '@loopback/boot';
 import { ServiceMixin } from '@loopback/service-proxy';
 import { RepositoryMixin } from '@loopback/repository';
 import { ApplicationConfig, BindingScope } from '@loopback/core';
 import { RestApplication } from '@loopback/rest';
 import { ExpectFunctionSequence } from './sequence';
-import { CerHelper } from '../../helpers/cer.helper';
+import { CredentialHelper } from '../../helpers/credential.helper';
 import { SpyHelper } from '../../helpers/spy.helper';
 
 export class ExpectFunctionApplication extends
@@ -32,25 +32,13 @@ export class ExpectFunctionApplication extends
             }
         };
 
-        this.bind('helper.cer').to(new CerHelper(this)).inScope(BindingScope.SINGLETON);
+        this.bind('helper.cer').to(new CredentialHelper(this)).inScope(BindingScope.SINGLETON);
         this.bind('helper.spy').to(new SpyHelper()).inScope(BindingScope.SINGLETON);
 
-        this.bind(CerBindings.DEFINITION).to({
-            options: {
-                cerSource: 'CACHE_THEN_DB'
-            },
-            strategy: {} as any,
-            cerExamples: {
-                'BOSS_PERMISSION': {
-                    CREATE_STAFF: true,
-                    READ_STAFF: true,
-                    UPDATE_STAFF: true
-                },
-                'ADMIN_PERMISSION': {
-                    UPDATE_EVERYTHING: true
-                }
-            }
+        this.bind(CredentialAuthBindings.DEFINITION).to({
+            credentialSource: 'CACHE_THEN_DB',
+            strategy: {} as any
         });
-        this.component(CerComponent);
+        this.component(CredentialAuthComponent);
     }
 }

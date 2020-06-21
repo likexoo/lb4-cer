@@ -1,56 +1,29 @@
-import { Request } from '@loopback/rest';
 import { ObjectId } from 'bson';
 import { AnyObject } from '@loopback/repository';
+import { CredentialModel } from './types/credential.type';
 
-// *********************
-// Definition
-// *********************
-
-export type CerDefinition = {
-    options: {
-        cerSource: 'CACHE' | 'DB' | 'CACHE_THEN_DB';
-    };
+export type Definition = {
+    credentialSource: 'CACHE' | 'DB' | 'CACHE_THEN_DB';
     strategy: CerStrategy;
-    cerExamples: CerPackageExamples;
 };
-
-// *********************
-// Default Types
-// *********************
-
-export type CerTokenMetadata = {
-    id: string | ObjectId;
-    cerTimestamp: string;
-} & AnyObject;
 
 export interface CerStrategy {
 
-    findCers(
-        request: Request,
-        tokenMetaData: CerTokenMetadata | undefined,
-        sequenceData: any | undefined
-    ): Promise<Array<CerEntity>>;
-
-    findCersTimestamp(
-        request: Request,
-        tokenMetaData: CerTokenMetadata | undefined,
-        sequenceData: any | undefined
-    ): Promise<Date>;
+    findCredentials(
+        id: string | ObjectId,
+        sequenceData?: any
+    ): Promise<Array<CredentialModel>>;
 
 }
 
-// *********************
-// Function
-// *********************
-
 export type UpdateFunction = (
     id: string | ObjectId,
-    cers: Array<CerEntity>
+    cers: Array<CredentialModel>
 ) => Promise<void>;
 
 export type ExpectFunction = (
-    request: Request,
-    tokenMetaData: CerTokenMetadata,
+    id: string | ObjectId,
+    statusId: string,
     sequenceMetaData?: any
 ) => Promise<ExpectFunctionReport | undefined>;
 
@@ -58,48 +31,23 @@ export type ExpectFunctionReport = {
     overview: {
         passedSituations: Array<string>;
         unpassedSituations: Array<string>;
-        tokenMetaData: CerTokenMetadata,
-        cerSource: 'CACHE' | 'DB' | 'NONE';
-        cers: Array<CerEntity>;
+        ownedCredentials: Array<CredentialModel>;
+        credentialSource: 'CACHE' | "DB" | 'UNDEFINED';
     };
     details: {
         [situation: string]: {
-            errors: Array<{ message: string; details: any; }>;
+            errors: Array<{ message: string; details: AnyObject; }>;
             passed: boolean;
-            relateds: any;
+            relevances: Array<AnyObject>;
         };
     }
+    statusId: string | undefined;
 };
 
-// *********************
-// Certificate Package
-// *********************
-
-export interface CerEntity {
-    id?: string | ObjectId;
-    package?: keyof CerPackageExamples;
-    contains?: { [key: string]: boolean };
-    relateds?: { [key: string]: string | ObjectId };
-}
-
-export type CerPackageExamples = {
-    [package_name: string]: {
-        [contain_name: string]: boolean;
-    }
-};
-
-export type CerPackageCached = {
+export type CredentialCached = {
     id: string | ObjectId;
-    timestamp: string;
-    cers: Array<CerEntity>;
+    statusId: string;
+    credentials: Array<CredentialModel>;
 };
 
-// *********************
-// Cer Spec
-// *********************
-
-export type CerSpec = {
-    [situation: string]: {
-        [p in keyof CerPackageExamples]?: Partial<CerPackageExamples[p]>;
-    }
-};
+export type PropType<T, P extends keyof T> = T[P];

@@ -9,7 +9,7 @@
         "pretest": "tsc",
         "test": "mocha \"dist/__tests__/**/*.js\"",
         "acceptance": "mocha \"dist/__tests__/acceptance/**/*.js\"",
-        "unit:expect-function": "mocha \"dist/acceptance/expect-function.acceptance\""
+        "unit:credential-auth": "mocha \"dist/acceptance/credential-auth.acceptance.acceptance\""
     },
     "author": "likexoo",
     "license": "MIT",

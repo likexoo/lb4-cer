@@ -1,6 +1,6 @@
 import { RestBindings, SequenceHandler, FindRoute, ParseParams, InvokeMethod, Send, Reject, RequestContext } from "@loopback/rest"; import { inject, Getter } from "@loopback/core";
-import { CerBindings, ExpectFunction, ExpectFunctionReport, CerTokenMetadata } from "../../../index";
 import { SpyHelper } from "../../helpers/spy.helper";
+import { ExpectFunction, CredentialAuthBindings, ExpectFunctionReport } from "../../../index";
 
 const SequenceActions = RestBindings.SequenceActions;
 
@@ -12,7 +12,7 @@ export class ExpectFunctionSequence implements SequenceHandler {
         @inject(SequenceActions.INVOKE_METHOD) protected invoke: InvokeMethod,
         @inject(SequenceActions.SEND) protected send: Send,
         @inject(SequenceActions.REJECT) protected reject: Reject,
-        @inject.getter(CerBindings.EXPECT_FUNCTION) public expectFunction: Getter<ExpectFunction>,
+        @inject.getter(CredentialAuthBindings.EXPECT_FUNCTION) public expectFunction: Getter<ExpectFunction>,
         @inject('helper.spy') public spyHelper: SpyHelper
     ) { }
     async handle(context: RequestContext) {
@@ -21,14 +21,15 @@ export class ExpectFunctionSequence implements SequenceHandler {
             const route = this.findRoute(request);
             const args = await this.parseParams(request, route);
 
-            let tokenMetaData: CerTokenMetadata = await this.spyHelper.runSpyFunction('sequence.beforeInvoke');
-            const cerReport: ExpectFunctionReport | undefined = await (await this.expectFunction())(
-                request,
-                tokenMetaData
+            let data = await this.spyHelper.runSpyFunction('sequence.beforeInvoke');
+            const report: ExpectFunctionReport | undefined = await (await this.expectFunction())(
+                data.id,
+                data.statusId,
+                data.sequenceMetaData
             );
             
             const result = await this.invoke(route, args);
-            this.send(response, { result, cerReport });
+            this.send(response, { result, report: report });
         } catch (error) {
             this.reject(context, error);
             return;

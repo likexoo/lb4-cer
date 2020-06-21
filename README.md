@@ -15,9 +15,9 @@ Step 1: Create Definition
 
 ```ts
 // xxx.definition.ts
-export const Definition: CerDefinition = {
+export const Definition: Definition = {
     options: {
-        cerSource: 'CACHE'
+        credentialSource: 'CACHE'
     },
     strategy: new TestStrategy(),
     cerExamples: {
@@ -53,7 +53,7 @@ Step 2: Install Component
 ```ts
 // application.ts
 
-this.bind(CerBindings.DEFINITION).to(CerDefinition);
+this.bind(CredentialAuthBindings.DEFINITION).to(Definition);
 this.component(CerComponent);
 
 ```
@@ -66,7 +66,7 @@ Step 3: Using In Your Sequence
 export class DefaultSequence implements SequenceHandler {
 
     constructor(
-        @inject.getter(CerBindings.EXPECT_FUNCTION) public expectFunction: Getter<ExpectFunction>
+        @inject.getter(CredentialAuthBindings.EXPECT_FUNCTION) public expectFunction: Getter<ExpectFunction>
         // ...
     ) { }
 
