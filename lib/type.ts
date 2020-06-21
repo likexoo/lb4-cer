@@ -1,20 +1,12 @@
 import { ObjectId } from 'bson';
 import { AnyObject } from '@loopback/repository';
 import { CredentialModel } from './types/credential.type';
+import { BasicCredentialRepository } from './repositories/basic-credential.repository';
 
 export type Definition = {
     credentialSource: 'CACHE' | 'DB' | 'CACHE_THEN_DB';
-    strategy: CerStrategy;
+    credentialRepository: BasicCredentialRepository;
 };
-
-export interface CerStrategy {
-
-    findCredentials(
-        id: string | ObjectId,
-        sequenceData?: any
-    ): Promise<Array<CredentialModel>>;
-
-}
 
 export type UpdateFunction = (
     id: string | ObjectId,

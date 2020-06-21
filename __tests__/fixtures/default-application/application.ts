@@ -7,6 +7,7 @@ import { RestApplication } from '@loopback/rest';
 import { ExpectFunctionSequence } from './sequence';
 import { CredentialHelper } from '../../helpers/credential.helper';
 import { SpyHelper } from '../../helpers/spy.helper';
+import { CredentialRepository } from './repositories/credential.repository';
 
 export class ExpectFunctionApplication extends
     BootMixin(
@@ -37,7 +38,7 @@ export class ExpectFunctionApplication extends
 
         this.bind(CredentialAuthBindings.DEFINITION).to({
             credentialSource: 'CACHE_THEN_DB',
-            strategy: {} as any
+            credentialRepository: new CredentialRepository()
         });
         this.component(CredentialAuthComponent);
     }

@@ -42,8 +42,8 @@ export class CredentialService {
             this.definition.credentialSource === 'DB' ||
             (report.source === undefined && this.definition.credentialSource === 'CACHE_THEN_DB')
         ) {
-            if (this.definition.strategy && typeof this.definition.strategy.findCredentials === 'function') {
-                const findCredentialsResult = await this.definition.strategy.findCredentials(id, sequenceData);
+            if (this.definition.credentialRepository && typeof this.definition.credentialRepository.findCredentials === 'function') {
+                const findCredentialsResult = await this.definition.credentialRepository.findCredentials(id, sequenceData);
                 if (findCredentialsResult && Array.isArray(findCredentialsResult)) {
                     report.credentials = findCredentialsResult;
                     report.source = 'DB';
@@ -83,8 +83,6 @@ export class CredentialService {
             const situationObject = credentialAuthMetadata[situation];
             let relevances: any[] = [];
             report.details[situation] = { errors: [], passed: true, relevances: [] };
-            // ingore non-cer properties
-            if (situation === 'options') return;
             // iterate over all expected packages
             Object.keys(situationObject).forEach((credentialModelCode: string) => {
                 // init

@@ -1,50 +1,68 @@
-# lb4-cer
+# Credential Auth
 
-A LoopBack component for permission authentication support.
+A LoopBack4 component for credential authentication support.
 
 This module is NOT ready for widespread use, and is currently only used by the developer's company.
 
-## Basic concepts
+## Quick Introduction
 
-- `Certificate` - Carrier of authority, stored in database.
-- `Strategy Class` - Class has function that return certificates according to the request and metadata in sequence.
-
-## How to use
-
-Step 1: Create Definition
+Step 1: Build Definition & Repository & Models
 
 ```ts
 // xxx.definition.ts
 export const Definition: Definition = {
-    options: {
-        credentialSource: 'CACHE'
-    },
-    strategy: new TestStrategy(),
-    cerExamples: {
-        'BOSS_PERMISSION': {
-            CREATE_STAFF: true,
-            READ_STAFF: true,
-            UPDATE_STAFF: true
-        },
-        'ADMIN_PERMISSION': {
-            UPDATE_EVERYTHING: true
-        }
-        // ...
-    }
+    credentialSource: 'CACHE_THEN_DB'
+    credentialRepository: new CredentialRepository()
 };
 
-class TestStrategy implements CerStrategy {
+// xxx.repository.ts
+export class CredentialRepository implements BasicCredentialRepository {
 
-    public async findCers(
-        request: Request,
-        tokenMetaData: CerTokenMetadata | undefined,
-        sequenceData: any | undefined
-    ): Promise<Array<CerEntity>> {
-        // get and return cers from database
+    public async findCredentials(
+        id: string | ObjectId,
+        sequenceData?: any
+    ): Promise<Array<CredentialModel>> {
+        // Find credentials by id and helpeful data from sequence in your database.
+        // For example, you can get the user's credentials based on the user id.
     }
 
-    // ...
+}
 
+// xxx.model.ts
+@model()
+export class ManagerCredential extends BasicCredentialEntity {
+
+    @property({
+        type: 'string',
+        id: true,
+        generated: true
+    })
+    _id?: ObjectId;
+
+    // The credential code
+    @property({ type: 'string' })
+    @credential.code('MANAGER')
+    code: string;
+
+    /*
+     * The credential point, here we use this property to decide whether 
+     * credential owner can update `staff` resource.
+     */
+    @property({ type: 'boolean' })
+    @credential.point('UPDATE_STAFF')
+    updateStaff: boolean;
+
+    /*
+     * The credential point, here we use this property to indicate the 
+     * credential owner's permission level.
+     */
+    @property({ type: 'number' })
+    @credential.point('LEVEL')
+    level: number;
+
+    constructor(data?: Partial<ManagerCredential>) {
+        super(data);
+    }
 }
 ```
 
@@ -52,38 +70,36 @@ Step 2: Install Component
 
 ```ts
 // application.ts
-
 this.bind(CredentialAuthBindings.DEFINITION).to(Definition);
 this.component(CerComponent);
-
 ```
 
 Step 3: Using In Your Sequence
 
 ```ts
 // sequence.ts
-
 export class DefaultSequence implements SequenceHandler {
 
     constructor(
         @inject.getter(CredentialAuthBindings.EXPECT_FUNCTION) public expectFunction: Getter<ExpectFunction>
-        // ...
     ) { }
 
     async handle(context: RequestContext) {
-        const cerReport: ExpectFunctionReport | undefined = await (await this.expectFunction())(request);
-        // do somthing with `cerReport` ...
-        // example 1: Check the report, throw an exception if the authentication fails
+
+        // do credential authentication here
+        const report: ExpectFunctionReport | undefined = await (await this.expectFunction())(id, statusId, sequenceMetaData);
+
+        // Now you can do somthing with `report` ...
+        // Example 1: Check the report, throw an exception if the authentication fails
         if (cerReport.overview.passedSituations.length === 0) throw { statusCode: 401, message: '...' };
-        // example 2: Bind the report to controller, use it in the corresponding method
-        context.bind('cer.report').to(cerReport).inScope(BindingScope.TRANSIENT);
+        // Example 2: Bind the report to controller, use it in the corresponding method
+        context.bind('cauth.report').to(report).inScope(BindingScope.TRANSIENT);
     }
 
 }
-
 ```
 
-Step 4: Using @cer In Your Controller
+Step 4: Using @cauth In Your Controller
 
 ```ts
 // xxx.controller.ts
@@ -91,30 +107,41 @@ Step 4: Using @cer In Your Controller
 export class TestController {
 
     constructor(
-        // if you are already bound `cerReport` in the sequence
-        @inject('cer.report') private cerReport: ExpectFunctionReport | undefined
+        // if you are already bound `report` in the sequence
+        @inject('cauth.report') private report: ExpectFunctionReport | undefined
     ) { }
 
     /**
      * Declare that to call this method, you need meet at least one situations (situation0 and situation1), 
      * each of which requires the necessary certificate.
      */
-    @cer({
-        // require `BOSS_PERMISSION.UPDATE_STAFF`
+    @cauth({
+        /*
+         * Situation 0 Credential Requirements:
+         * 1. require `MANAGER` credential.
+         * 2. require `MANAGER.UPDATE_STAFF` is true.
+         */
         situation0: {
-            'BOSS_PERMISSION': {
+            'MANAGER': {
                 UPDATE_STAFF: true
             }
         },
-        // require `ADMIN_PERMISSION.UPDATE_EVERYTHING`
+        /*
+         * Situation 1 Credential Requirements:
+         * 1. require `MANAGER` credential.
+         * 2. require `MANAGER.UPDATE_STAFF` is true.
+         * 3. require `MANAGER.LEVEL` greater than 10.
+         */
         situation1: {
-            'ADMIN_PERMISSION': {
-                UPDATE_EVERYTHING: true
+            'MANAGER': {
+                UPDATE_STAFF: true,
+                LEVEL: (val: number) => val >= 10
             }
         }
     })
     @patch('/v1/staff')
     async updateOneStaff() {
+        // So write different service logic according to different situations.
         // ...
     }
 
