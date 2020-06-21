@@ -1,8 +1,11 @@
-# Credential Auth
+# LB4 Credential Auth
 
 A LoopBack4 component for credential authentication support.
 
 This module is NOT ready for widespread use, and is currently only used by the developer's company.
+
+[![Build Status](https://travis-ci.org/likexoo/lb4-credential-auth.svg?branch=master)](https://travis-ci.org/likexoo/lb4-credential-auth)
+[![npm version](https://badge.fury.io/js/lb4-credential-auth.svg)](https://www.npmjs.com/package/lb4-credential-auth)
 
 ## Quick Introduction
 
