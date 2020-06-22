@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+    - "10"
+    - "12"
+    - "13"
+install:
+    - npm install
+jobs:
+    include:
+      - stage: test
+        if: branch = master
+        script: npm test
