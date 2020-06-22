@@ -7,9 +7,8 @@
     "scripts": {
         "build": "tsc",
         "pretest": "tsc",
-        "test": "mocha \"dist/__tests__/**/*.js\"",
-        "acceptance": "mocha \"dist/__tests__/acceptance/**/*.js\"",
-        "unit:credential-auth": "mocha \"dist/acceptance/credential-auth.acceptance.acceptance\""
+        "test": "mocha \"dist/__tests__/**/*.js\" --exit",
+        "acceptance": "mocha \"dist/__tests__/acceptance/**/*.js\" --exit"
     },
     "author": "likexoo",
     "license": "MIT",

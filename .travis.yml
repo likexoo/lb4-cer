@@ -11,6 +11,8 @@ stages:
 
 job_acceptance_test:
     stage: acceptance_test
+    if: branch = master
     script:
         - "yarn install"
         - "yarn test"
+        - travis_terminate 1;
