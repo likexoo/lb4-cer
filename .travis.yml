@@ -10,3 +10,4 @@ job_test:
     stage: deploy
     script:
         - "yarn install"
+        - "yarn test"
