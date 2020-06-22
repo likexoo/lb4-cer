@@ -9,5 +9,6 @@ stages:
 job_test:
     stage: deploy
     script:
+        - "yarn add typescript"
         - "yarn install"
         - "yarn test"
