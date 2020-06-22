@@ -10,6 +10,9 @@ export type CredentialCodeSpec = {
 
 export type CredentialPointSpec = {
     val: string;
+    options?: {
+        message?: string;
+    }
 }
 
 export type CredentialRelevanceSpec = {

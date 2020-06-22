@@ -14,11 +14,12 @@ export class credential {
     }
 
     public static point(
-        val: string
+        val: string,
+        options: { message?: string } = {}
     ) {
         return PropertyDecoratorFactory.createDecorator<CredentialPointSpec>(
             CredentialAuthBindings.CERDENTIALS_POINT_METADATA,
-            { val }
+            { val, options }
         );
     }
 

@@ -1,7 +1,8 @@
 import { Entity } from "@loopback/repository";
 import { MetadataInspector } from "@loopback/metadata";
-import { CredentialPointSpec } from "../types/credential.type";
+import { CredentialPointSpec, CredentialCodeSpec } from "../types/credential.type";
 import _ from "lodash";
+import { MetadataReport } from "../type";
 
 export class BasicCredentialEntity extends Entity {
 
@@ -35,21 +36,31 @@ export class BasicCredentialEntity extends Entity {
         }
     };
 
-    public getCode(): string | undefined {
+    public getCode(): MetadataReport<CredentialCodeSpec> | undefined {
         const metadatas = this.getMetadataByRegularExpression(/^(module.credentialAuth.codeMetadata)$/i);
-        return _.get(metadatas, '[0].metadata.val');
+        if (Array.isArray(metadatas) && metadatas.length > 0)
+            return {
+                metadata: metadatas[0].metadata,
+                key: metadatas[0].target,
+                value: _.get(this, metadatas[0].target)
+            };
+        else return undefined;
     }
 
-    public findPoint(code: string): any {
-        let val: any = undefined;
+    public findPoint(code: string): MetadataReport<CredentialPointSpec> | undefined {
+        let mt: MetadataReport<CredentialPointSpec> | undefined = undefined;
         const metadatas = this.getMetadataByRegularExpression(/^(module.credentialAuth.pointMetadata)$/i);
         for (let m of metadatas) {
             if (_.get(m, 'metadata.val') === code) {
-                val = _.get(this, m.target);
+                mt = {
+                    metadata: m.metadata,
+                    key: m.target,
+                    value: _.get(this, m.target)
+                };
                 break;
             }
         }
-        return val;
+        return mt;
     }
 
     public getRelevances(): Array<{ key: string; value: any, metadata: CredentialPointSpec; }> {

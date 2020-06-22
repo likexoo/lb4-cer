@@ -21,7 +21,7 @@ export class ManagerCredential extends BasicCredentialEntity {
     updateStaff: boolean;
 
     @property({ type: 'number' })
-    @credential.point('LEVEL')
+    @credential.point('LEVEL', { message: 'No Required Level' })
     level: number;
 
     @property({ type: 'object' })
