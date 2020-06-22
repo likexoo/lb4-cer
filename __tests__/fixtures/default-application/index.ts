@@ -5,14 +5,14 @@ export async function DefaultMain(options: ApplicationConfig = {
     shutdown: { signals: ['SIGINT'] },
     rest: {
         port: +(process.env.PORT || 6006),
-        host: process.env.HOST,
+        host: '0.0.0.0',
         openApiSpec: {
             setServersFromRequest: false,
         }
     },
     websocket: {
         port: +(process.env.PORT || 6016),
-        host: process.env.HOST
+        host: '0.0.0.0'
     }
 }) {
 
