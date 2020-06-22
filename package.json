@@ -31,7 +31,8 @@
         "bson": "^4.0.4",
         "jest": "^26.0.1",
         "lodash": "^4.17.15",
-        "node-cache": "^5.1.0"
+        "node-cache": "^5.1.0",
+        "typescript": "^3.9.5"
     },
     "files": [
         "README.md",
