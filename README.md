@@ -115,8 +115,8 @@ export class TestController {
     ) { }
 
     /**
-     * Declare that to call this method, you need meet at least one situations (situation0 and situation1), 
-     * each of which requires the necessary certificate.
+     * Declare that to call this method, you need match at least one situations (situation0 or situation1 or both), 
+     * each of which requires the necessary credentials.
      */
     @cauth({
         /*
@@ -125,8 +125,10 @@ export class TestController {
          * 2. require `MANAGER.UPDATE_STAFF` is true.
          */
         situation0: {
-            'MANAGER': {
-                UPDATE_STAFF: true
+            credentials: {
+                'MANAGER': {
+                    UPDATE_STAFF: true
+                }
             }
         },
         /*
@@ -136,15 +138,17 @@ export class TestController {
          * 3. require `MANAGER.LEVEL` greater than 10.
          */
         situation1: {
-            'MANAGER': {
-                UPDATE_STAFF: true,
-                LEVEL: (val: number) => val >= 10
+            credentials: {
+                'MANAGER': {
+                    UPDATE_STAFF: true,
+                    LEVEL: (val: number) => val >= 10
+                }
             }
         }
     })
     @patch('/v1/staff')
     async updateOneStaff() {
-        // So write different service logic according to different situations.
+        // Write different service logic according to different situations.
         // ...
     }
 

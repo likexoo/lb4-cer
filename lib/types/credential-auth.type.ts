@@ -1,12 +1,20 @@
+import { SingleExpectReport } from "../type";
 
 export type CredentialAuthSpec = {
-    [situation: string]: {
-        [credential_model: string]: {
-            [credential_point: string]: CredentialPointChecker;
-        };
+    [situation: string]:
+    {
+        credentials?: {
+            [credential_model: string]: {
+                [credential_point: string]: CredentialPointChecker;
+            };
+        }
+        checker?: CredentialChecker;
     }
 };
 
+export type CredentialChecker =
+    (report: SingleExpectReport, sequenceData?: any ) => boolean;
+
 export type CredentialPointChecker =
-    ((pointVal: any) => boolean) |
+    ((pointVal: any, sequenceData?: any) => boolean) |
     boolean;

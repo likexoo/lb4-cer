@@ -12,13 +12,13 @@ export type Definition = {
 
 export type UpdateFunction = (
     id: string | ObjectId,
-    cers: Array<CredentialModel>
+    credentials: Array<CredentialModel>
 ) => Promise<void>;
 
 export type ExpectFunction = (
     id: string | ObjectId,
     statusId: string,
-    sequenceMetaData?: any
+    sequenceData?: any
 ) => Promise<ExpectFunctionReport | undefined>;
 
 export type ExpectFunctionReport = {
@@ -29,13 +29,15 @@ export type ExpectFunctionReport = {
         credentialSource: 'CACHE' | "DB" | 'UNDEFINED';
     };
     details: {
-        [situation: string]: {
-            errors: Array<{ message: string; details: AnyObject; }>;
-            passed: boolean;
-            relevances: Array<AnyObject>;
-        };
+        [situation: string]: SingleExpectReport;
     }
     statusId: string | undefined;
+};
+
+export type SingleExpectReport = {
+    errors: Array<{ message: string; details: AnyObject; }>;
+    passed: boolean;
+    relevances: Array<AnyObject>;
 };
 
 export type CredentialCached = {

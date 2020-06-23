@@ -25,7 +25,7 @@ export class ExpectFunctionSequence implements SequenceHandler {
             const report: ExpectFunctionReport | undefined = await (await this.expectFunction())(
                 data.id,
                 data.statusId,
-                data.sequenceMetaData
+                data.sequenceData
             );
             
             const result = await this.invoke(route, args);

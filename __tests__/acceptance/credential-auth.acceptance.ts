@@ -204,31 +204,73 @@ describe('@cauth', () => {
 
         // not having the required credentials
 
-            await credentialHelper.insertFromNodeCache(
-                'TEST_USER_ID',
-                {
+        await credentialHelper.insertFromNodeCache(
+            'TEST_USER_ID',
+            {
+                id: 'TEST_USER_ID',
+                statusId,
+                credentials: []
+            } as CredentialCached
+        );
+        spyHelper.upsertSpyFunction(
+            'sequence.beforeInvoke',
+            async () => {
+                return {
                     id: 'TEST_USER_ID',
-                    statusId,
-                    credentials: [ ]
-                } as CredentialCached
-            );
-            spyHelper.upsertSpyFunction(
-                'sequence.beforeInvoke',
-                async () => {
-                    return {
-                        id: 'TEST_USER_ID',
-                        statusId: statusId,
-                        sequenceData: {}
+                    statusId: statusId,
+                    sequenceData: {}
+                }
+            }
+        );
+
+        const result5 = await client.get('/test3');
+        expect(result5).propertyByPath('status').eql(200);
+        expect(result5).propertyByPath('body', 'report', 'overview', 'credentialSource').eql('CACHE');
+        expect(result5).propertyByPath('body', 'report', 'overview', 'passedSituations', 'length').eql(0);
+        expect(result5).propertyByPath('body', 'report', 'details', 'situation0', 'passed').eql(false);
+        expect(result5).propertyByPath('body', 'report', 'details', 'situation1', 'passed').eql(false);
+
+        // having the required credentials with checker
+
+        await credentialHelper.insertFromNodeCache(
+            'TEST_USER_ID',
+            {
+                id: 'TEST_USER_ID',
+                statusId,
+                credentials: [
+                    new ManagerCredential({
+                        _id: new ObjectId(),
+                        updateStaff: true,
+                        level: 4,
+                        belongedCompanyId,
+                        ownedCompanies: [ownedCompanies1, ownedCompanies2]
+                    })
+                ]
+            } as CredentialCached
+        );
+        spyHelper.upsertSpyFunction(
+            'sequence.beforeInvoke',
+            async () => {
+                return {
+                    id: 'TEST_USER_ID',
+                    statusId: statusId,
+                    sequenceData: {
+                        sequenceDataLevel: 10
                     }
                 }
-            );
+            }
+        );
 
-            const result5 = await client.get('/test3');
-            expect(result5).propertyByPath('status').eql(200);
-            expect(result5).propertyByPath('body', 'report', 'overview', 'credentialSource').eql('CACHE');
-            expect(result5).propertyByPath('body', 'report', 'overview', 'passedSituations', 'length').eql(0);
-            expect(result5).propertyByPath('body', 'report', 'details', 'situation0', 'passed').eql(false);
-            expect(result5).propertyByPath('body', 'report', 'details', 'situation1', 'passed').eql(false);
+        const result6 = await client.get('/test4');
+
+        expect(result6).propertyByPath('status').eql(200);
+        expect(result6).propertyByPath('body', 'report', 'overview', 'credentialSource').eql('CACHE');
+        expect(result6).propertyByPath('body', 'report', 'overview', 'passedSituations', 'length').eql(0);
+        expect(result6).propertyByPath('body', 'report', 'details', 'situation0', 'passed').eql(false);
+        expect(result6).propertyByPath('body', 'report', 'details', 'situation1', 'passed').eql(false);
+        expect(result6).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '0', 'value').eql(`${belongedCompanyId}`);
+        expect(result6).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '0').eql(`${ownedCompanies1}`);
+        expect(result6).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '1').eql(`${ownedCompanies2}`);
 
     });
 
