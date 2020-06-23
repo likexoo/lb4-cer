@@ -13,12 +13,6 @@
     "author": "likexoo",
     "license": "MIT",
     "dependencies": {
-        "@loopback/boot": "^2.3.2",
-        "@loopback/context": "^3.8.2",
-        "@loopback/core": "^2.7.1",
-        "@loopback/metadata": "^2.1.6",
-        "@loopback/repository": "^2.6.0",
-        "@loopback/rest": "^5.1.0",
         "@types/uuid": "^8.0.0",
         "@types/lodash": "^4.14.155",
         "@types/bson": "^4.0.2",
@@ -27,6 +21,12 @@
         "node-cache": "^5.1.0"
     },
     "devDependencies": {
+        "@loopback/boot": "^2.3.2",
+        "@loopback/context": "^3.8.2",
+        "@loopback/core": "^2.7.1",
+        "@loopback/metadata": "^2.1.6",
+        "@loopback/repository": "^2.6.0",
+        "@loopback/rest": "^5.1.0",
         "@loopback/openapi-spec-builder": "^2.1.6",
         "@loopback/testlab": "^3.1.6",
         "@types/mocha": "^7.0.2",
