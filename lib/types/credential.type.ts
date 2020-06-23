@@ -16,4 +16,5 @@ export type CredentialPointSpec = {
 }
 
 export type CredentialRelevanceSpec = {
+    val: string;
 }

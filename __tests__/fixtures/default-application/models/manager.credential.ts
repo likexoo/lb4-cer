@@ -25,12 +25,12 @@ export class ManagerCredential extends BasicCredentialEntity {
     level: number;
 
     @property({ type: 'object' })
-    @credential.relevance()
+    @credential.relevance('BELONGED_COMPANY_ID')
     belongedCompanyId: ObjectId;
 
     @property.array(ObjectId)
-    @credential.relevance()
-    ownedRestaurants: Array<ObjectId>;
+    @credential.relevance('OWNED_COMPANY_IDS')
+    ownedCompanies: Array<ObjectId>;
 
     constructor(data?: Partial<ManagerCredential>) {
         super(data);

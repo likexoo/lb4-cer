@@ -50,8 +50,8 @@ describe('@cauth', () => {
 
         const statusId = uuidv4();
         const belongedCompanyId = new ObjectId();
-        const ownedRestaurants1 = new ObjectId();
-        const ownedRestaurants2 = new ObjectId();
+        const ownedCompanies1 = new ObjectId();
+        const ownedCompanies2 = new ObjectId();
         await credentialHelper.updateCerDefintion('options.credentialSource', 'CACHE');
 
         // having the required credentials
@@ -67,7 +67,7 @@ describe('@cauth', () => {
                         updateStaff: true,
                         level: 4,
                         belongedCompanyId,
-                        ownedRestaurants: [ownedRestaurants1, ownedRestaurants2]
+                        ownedCompanies: [ownedCompanies1, ownedCompanies2]
                     })
                 ]
             } as CredentialCached
@@ -91,8 +91,8 @@ describe('@cauth', () => {
         expect(result1).propertyByPath('body', 'report', 'details', 'situation0', 'passed').eql(true);
         expect(result1).propertyByPath('body', 'report', 'details', 'situation1', 'passed').eql(false);
         expect(result1).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '0', 'value').eql(`${belongedCompanyId}`);
-        expect(result1).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '0').eql(`${ownedRestaurants1}`);
-        expect(result1).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '1').eql(`${ownedRestaurants2}`);
+        expect(result1).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '0').eql(`${ownedCompanies1}`);
+        expect(result1).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '1').eql(`${ownedCompanies2}`);
 
         // having the required credentials (but points invalid)
 
@@ -107,7 +107,7 @@ describe('@cauth', () => {
                         updateStaff: false,
                         level: 1,
                         belongedCompanyId,
-                        ownedRestaurants: [ownedRestaurants1, ownedRestaurants2]
+                        ownedCompanies: [ownedCompanies1, ownedCompanies2]
                     })
                 ]
             } as CredentialCached
@@ -143,7 +143,7 @@ describe('@cauth', () => {
                         updateStaff: true,
                         level: 4,
                         belongedCompanyId,
-                        ownedRestaurants: [ownedRestaurants1, ownedRestaurants2]
+                        ownedCompanies: [ownedCompanies1, ownedCompanies2]
                     })
                 ]
             } as CredentialCached
@@ -179,7 +179,7 @@ describe('@cauth', () => {
                         updateStaff: true,
                         level: 4,
                         belongedCompanyId,
-                        ownedRestaurants: [ownedRestaurants1, ownedRestaurants2]
+                        ownedCompanies: [ownedCompanies1, ownedCompanies2]
                     })
                 ]
             } as CredentialCached

@@ -24,11 +24,11 @@ export class credential {
     }
 
     public static relevance(
-        spec: CredentialRelevanceSpec = {}
+        type: string
     ) {
         return PropertyDecoratorFactory.createDecorator<CredentialRelevanceSpec>(
             CredentialAuthBindings.CERDENTIALS_RELEVANCE_METADATA,
-            spec
+            { val: type }
         );
     }
 

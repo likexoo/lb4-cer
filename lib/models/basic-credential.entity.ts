@@ -63,7 +63,7 @@ export class BasicCredentialEntity extends Entity {
         return mt;
     }
 
-    public getRelevances(): Array<{ key: string; value: any, metadata: CredentialPointSpec; }> {
+    public getRelevances(): Array<MetadataReport<CredentialPointSpec>> {
         const metadatas = this.getMetadataByRegularExpression(/^(module.credentialAuth.relevanceMetadata)$/i);
         return metadatas.map(m => ({ key: m.target, value: _.get(this, m.target), metadata: m.metadata }));
     }
