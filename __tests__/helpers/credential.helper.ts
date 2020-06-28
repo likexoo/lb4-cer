@@ -20,11 +20,16 @@ export class CredentialHelper extends Context {
         return await this.get(CredentialAuthBindings.NODE_CACHE);
     }
 
-    public async updateCerDefintion(path: string, val: any): Promise<void> {
+    public async updateDefintion(path: string, val: any): Promise<void> {
         let definition = await this.app.get(CredentialAuthBindings.DEFINITION);
         _.set(definition, path, val)
         this.app.bind(CredentialAuthBindings.DEFINITION)
-            .to(definition);
+            .to(definition).refresh(this.app);
+    }
+
+    public async updateCredentialRepository(val: any): Promise<void> {
+        this.app.bind(CredentialAuthBindings.CREDENTIAL_REPOSITORY)
+            .to(val).refresh(this.app);
     }
 
     public async insertFromNodeCache(key: string, val: any): Promise<string> {

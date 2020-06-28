@@ -36,10 +36,8 @@ export class ExpectFunctionApplication extends
         this.bind('helper.cer').to(new CredentialHelper(this)).inScope(BindingScope.SINGLETON);
         this.bind('helper.spy').to(new SpyHelper()).inScope(BindingScope.SINGLETON);
 
-        this.bind(CredentialAuthBindings.DEFINITION).to({
-            credentialSource: 'CACHE_THEN_DB',
-            credentialRepository: new CredentialRepository()
-        });
+        this.bind(CredentialAuthBindings.DEFINITION).to({ credentialSource: 'CACHE_THEN_DB' });
+        this.bind(CredentialAuthBindings.CREDENTIAL_REPOSITORY).toClass(CredentialRepository);
         this.component(CredentialAuthComponent);
     }
 }

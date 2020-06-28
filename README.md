@@ -15,7 +15,6 @@ Step 1: Build Definition & Repository & Models
 // xxx.definition.ts
 export const Definition: Definition = {
     credentialSource: 'CACHE_THEN_DB'
-    credentialRepository: new CredentialRepository()
 };
 
 // xxx.repository.ts
@@ -74,7 +73,8 @@ Step 2: Install Component
 ```ts
 // application.ts
 this.bind(CredentialAuthBindings.DEFINITION).to(Definition);
-this.component(CerComponent);
+this.bind(CredentialAuthBindings.CREDENTIAL_REPOSITORY).toClass(CredentialRepository);
+this.component(CredentialAuthComponent);
 ```
 
 Step 3: Using In Your Sequence

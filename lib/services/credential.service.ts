@@ -6,12 +6,15 @@ import { Definition, CredentialCached, PropType, ExpectFunctionReport } from "..
 import { v4 as uuidv4 } from 'uuid';
 import { CredentialAuthSpec } from "../types/credential-auth.type";
 import _ from "lodash";
+import { BasicCredentialRepository } from "../repositories/basic-credential.repository";
 
 export class CredentialService {
 
     constructor(
         @inject(CredentialAuthBindings.DEFINITION)
         private readonly definition: Definition,
+        @inject(CredentialAuthBindings.CREDENTIAL_REPOSITORY)
+        private readonly credentialRepository: BasicCredentialRepository,
         @inject(CredentialAuthBindings.NODE_CACHE)
         private readonly nodeCache: NodeCache,
     ) { }
@@ -43,8 +46,8 @@ export class CredentialService {
             this.definition.credentialSource === 'DB' ||
             (report.source === undefined && this.definition.credentialSource === 'CACHE_THEN_DB')
         ) {
-            if (this.definition.credentialRepository && typeof this.definition.credentialRepository.findCredentials === 'function') {
-                const findCredentialsResult = await this.definition.credentialRepository.findCredentials(id, sequenceData);
+            if (this.credentialRepository && typeof this.credentialRepository.findCredentials === 'function') {
+                const findCredentialsResult = await this.credentialRepository.findCredentials(id, sequenceData);
                 if (findCredentialsResult && Array.isArray(findCredentialsResult)) {
                     report.credentials = findCredentialsResult;
                     report.source = 'DB';

@@ -1,13 +1,11 @@
 import { ObjectId } from 'bson';
 import { AnyObject } from '@loopback/repository';
 import { CredentialModel } from './types/credential.type';
-import { BasicCredentialRepository } from './repositories/basic-credential.repository';
 
 export type MetadataReport<T = AnyObject> = { key: any; value: any; metadata: T; };
 
 export type Definition = {
     credentialSource: 'CACHE' | 'DB' | 'CACHE_THEN_DB';
-    credentialRepository: BasicCredentialRepository;
 };
 
 export type UpdateFunction = (
