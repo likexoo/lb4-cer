@@ -28,11 +28,10 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
         id: string | ObjectId,
         statusId: string,
         sequenceData?: any
-    ): Promise<ExpectFunctionReport | undefined> {
+    ): Promise<ExpectFunctionReport> {
         const metadata: CredentialAuthSpec | undefined = MetadataInspector.getMethodMetadata(CredentialAuthBindings.CREDENTIAL_AUTH_METADATA, this.controllerClass.prototype, this.methodName);
-        if (!metadata) return;
         const result = await this.credentialService.getCredentials(id, statusId, sequenceData);
-        let report: ExpectFunctionReport = this.credentialService.expect(result.credentials, metadata, sequenceData);
+        let report: ExpectFunctionReport = this.credentialService.expect(result.credentials, metadata!, sequenceData);
         report.statusId = statusId;
         report.overview.credentialSource = result.source;
         return report;
