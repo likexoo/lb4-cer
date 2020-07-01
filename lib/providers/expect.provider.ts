@@ -1,9 +1,7 @@
 import { Provider, ValueOrPromise, MetadataInspector, inject, Constructor } from '@loopback/context';
-import { Request } from '@loopback/rest';
-import NodeCache = require('node-cache');
 import { CoreBindings } from '@loopback/core';
 import { CredentialAuthBindings } from '../binding';
-import { ExpectFunction, ExpectFunctionReport, CredentialCached, Definition } from '../type';
+import { ExpectFunction, ExpectFunctionReport } from '../type';
 import { CredentialAuthSpec } from '../types/credential-auth.type';
 import { ObjectId } from 'bson';
 import { CredentialService } from '../services/credential.service';

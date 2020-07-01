@@ -119,29 +119,31 @@ export class TestController {
      * each of which requires the necessary credentials.
      */
     @cauth({
-        /*
-         * Situation 0 Credential Requirements:
-         * 1. require `MANAGER` credential.
-         * 2. require `MANAGER.UPDATE_STAFF` is true.
-         */
-        situation0: {
-            credentials: {
-                'MANAGER': {
-                    UPDATE_STAFF: true
+        situations: {
+            /*
+             * Situation 0 Credential Requirements:
+             * 1. require `MANAGER` credential.
+             * 2. require `MANAGER.UPDATE_STAFF` is true.
+             */
+            situation0: {
+                credentials: {
+                    'MANAGER': {
+                        UPDATE_STAFF: true
+                    }
                 }
-            }
-        },
-        /*
-         * Situation 1 Credential Requirements:
-         * 1. require `MANAGER` credential.
-         * 2. require `MANAGER.UPDATE_STAFF` is true.
-         * 3. require `MANAGER.LEVEL` greater than 10.
-         */
-        situation1: {
-            credentials: {
-                'MANAGER': {
-                    UPDATE_STAFF: true,
-                    LEVEL: (val: number) => val >= 10
+            },
+            /*
+             * Situation 1 Credential Requirements:
+             * 1. require `MANAGER` credential.
+             * 2. require `MANAGER.UPDATE_STAFF` is true.
+             * 3. require `MANAGER.LEVEL` greater than 10.
+             */
+            situation1: {
+                credentials: {
+                    'MANAGER': {
+                        UPDATE_STAFF: true,
+                        LEVEL: (val: number) => val >= 10
+                    }
                 }
             }
         }
