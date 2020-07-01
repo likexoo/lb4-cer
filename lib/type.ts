@@ -30,6 +30,8 @@ export type ExpectFunctionReport = {
         [situation: string]: SingleExpectReport;
     }
     statusId: string | undefined;
+    isMetadataExists: boolean;
+    isOptional: boolean;
 };
 
 export type SingleExpectReport = {

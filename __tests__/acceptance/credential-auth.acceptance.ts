@@ -46,10 +46,11 @@ describe('@cauth', () => {
         const result1 = await client.get('/test1');
         expect(result1).propertyByPath('status').eql(200);
         expect(result1).propertyByPath('body', 'report').Object();
+        expect(result1).propertyByPath('body', 'report', 'isMetadataExists').True();
 
         const result2 = await client.get('/test2');
         expect(result2).propertyByPath('status').eql(200);
-
+        
     });
 
     it(`@cauth with options.credentialSource = 'CACHE'`, async () => {

@@ -94,7 +94,7 @@ export class DefaultSequence implements SequenceHandler {
 
         // Now you can do somthing with `report` ...
         // Example 1: Check the report, throw an exception if the authentication fails
-        if (cerReport.overview.passedSituations.length === 0) throw { statusCode: 401, message: '...' };
+        if (report.overview.passedSituations.length === 0) throw { statusCode: 401, message: '...' };
         // Example 2: Bind the report to controller, use it in the corresponding method
         context.bind('cauth.report').to(report).inScope(BindingScope.TRANSIENT);
     }

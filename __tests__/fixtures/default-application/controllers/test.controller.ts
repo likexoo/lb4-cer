@@ -4,7 +4,11 @@ import { cauth, SingleExpectReport } from "../../../../index";
 export class ExpectFunctionController {
     constructor() { }
 
-    @cauth({ s: {} })
+    @cauth({
+        situations: {
+            s: {}
+        }
+    })
     @get('/test1')
     async test1(): Promise<string> {
         return 'ok';
@@ -16,18 +20,20 @@ export class ExpectFunctionController {
     }
 
     @cauth({
-        situation0: {
-            credentials: {
-                'MANAGER': {
-                    UPDATE_STAFF: true,
-                    LEVEL: (val: number) => val >= 2
+        situations: {
+            situation0: {
+                credentials: {
+                    'MANAGER': {
+                        UPDATE_STAFF: true,
+                        LEVEL: (val: number) => val >= 2
+                    }
                 }
-            }
-        },
-        situation1: {
-            credentials: {
-                'ADMIN': {
-                    UPDATE_EVERYTHING: true
+            },
+            situation1: {
+                credentials: {
+                    'ADMIN': {
+                        UPDATE_EVERYTHING: true
+                    }
                 }
             }
         }
@@ -38,19 +44,21 @@ export class ExpectFunctionController {
     }
 
     @cauth({
-        situation0: {
-            credentials: {
-                'MANAGER': {
-                    UPDATE_STAFF: true,
-                    LEVEL: (val: number) => val >= 2
+        situations: {
+            situation0: {
+                credentials: {
+                    'MANAGER': {
+                        UPDATE_STAFF: true,
+                        LEVEL: (val: number) => val >= 2
+                    },
                 },
+                checker: (report: SingleExpectReport, sequenceData?: any): boolean => sequenceData.sequenceDataLevel >= 20
             },
-            checker: (report: SingleExpectReport, sequenceData?: any): boolean => sequenceData.sequenceDataLevel >= 20
-        },
-        situation1: {
-            credentials: {
-                'ADMIN': {
-                    UPDATE_EVERYTHING: true
+            situation1: {
+                credentials: {
+                    'ADMIN': {
+                        UPDATE_EVERYTHING: true
+                    }
                 }
             }
         }

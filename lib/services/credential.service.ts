@@ -78,14 +78,18 @@ export class CredentialService {
                 credentialSource: 'UNDEFINED'
             },
             details: {},
-            statusId: undefined
+            statusId: undefined,
+            isMetadataExists: false,
+            isOptional: _.get(credentialAuthMetadata, 'options.optional', false)
         };
         ownedCredentials = Array.isArray(ownedCredentials) ? ownedCredentials : [];
         if (!credentialAuthMetadata) return report;
+        report.isMetadataExists = true;
         // $ iterate over all situations
-        Object.keys(credentialAuthMetadata).forEach((situation: string) => {
+        let situations = credentialAuthMetadata.situations;
+        Object.keys(situations).forEach((situation: string) => {
             // init
-            const situationObject = credentialAuthMetadata[situation];
+            const situationObject = situations[situation];
             let relevances: any[] = [];
             report.details[situation] = { errors: [], passed: true, relevances: [] };
             // iterate over all expected packages
