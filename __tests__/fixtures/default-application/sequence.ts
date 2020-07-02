@@ -24,7 +24,6 @@ export class ExpectFunctionSequence implements SequenceHandler {
             let data = await this.spyHelper.runSpyFunction('sequence.beforeInvoke');
             const report: ExpectFunctionReport | undefined = await (await this.expectFunction())(
                 data.id,
-                data.statusId,
                 data.sequenceData
             );
             

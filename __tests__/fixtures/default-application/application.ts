@@ -1,4 +1,4 @@
-import { CredentialAuthBindings, CredentialAuthComponent } from '../../../index';
+import { CredentialAuthComponent } from '../../../index';
 import { BootMixin } from '@loopback/boot';
 import { ServiceMixin } from '@loopback/service-proxy';
 import { RepositoryMixin } from '@loopback/repository';
@@ -7,7 +7,6 @@ import { RestApplication } from '@loopback/rest';
 import { ExpectFunctionSequence } from './sequence';
 import { CredentialHelper } from '../../helpers/credential.helper';
 import { SpyHelper } from '../../helpers/spy.helper';
-import { CredentialRepository } from './repositories/credential.repository';
 
 export class ExpectFunctionApplication extends
     BootMixin(
@@ -36,8 +35,6 @@ export class ExpectFunctionApplication extends
         this.bind('helper.cer').to(new CredentialHelper(this)).inScope(BindingScope.SINGLETON);
         this.bind('helper.spy').to(new SpyHelper()).inScope(BindingScope.SINGLETON);
 
-        this.bind(CredentialAuthBindings.DEFINITION).to({ credentialSource: 'CACHE_THEN_DB' });
-        this.bind(CredentialAuthBindings.CREDENTIAL_REPOSITORY).toClass(CredentialRepository);
         this.component(CredentialAuthComponent);
     }
 }

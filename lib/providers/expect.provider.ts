@@ -21,19 +21,16 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
     }
 
     value(): ValueOrPromise<ExpectFunction> {
-        return (id: string | ObjectId, statusId: string, sequenceData?: any) => this.action(id, statusId, sequenceData);
+        return (id: string | ObjectId, sequenceData?: any) => this.action(id, sequenceData);
     }
 
     async action(
         id: string | ObjectId,
-        statusId: string,
         sequenceData?: any
     ): Promise<ExpectFunctionReport> {
         const metadata: CredentialAuthSpec | undefined = MetadataInspector.getMethodMetadata(CredentialAuthBindings.CREDENTIAL_AUTH_METADATA, this.controllerClass.prototype, this.methodName);
-        const result = await this.credentialService.getCredentials(id, statusId, sequenceData);
-        let report: ExpectFunctionReport = this.credentialService.expect(result.credentials, metadata!, sequenceData);
-        report.statusId = statusId;
-        report.overview.credentialSource = result.source;
+        const cachedCredentials = await this.credentialService.getCredentials(id);
+        let report: ExpectFunctionReport = this.credentialService.expect(cachedCredentials, metadata!, sequenceData);
         return report;
     }
 

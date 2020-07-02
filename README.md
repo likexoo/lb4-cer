@@ -9,27 +9,9 @@ This module is NOT ready for widespread use, and is currently only used by the d
 
 ## Quick Introduction
 
-Step 1: Build Definition & Repository & Models
+Step 1: Build Credential Models
 
 ```ts
-// xxx.definition.ts
-export const Definition: Definition = {
-    credentialSource: 'CACHE_THEN_DB'
-};
-
-// xxx.repository.ts
-export class CredentialRepository implements BasicCredentialRepository {
-
-    public async findCredentials(
-        id: string | ObjectId,
-        sequenceData?: any
-    ): Promise<Array<CredentialModel>> {
-        // Find credentials by id and helpeful data from sequence in your database.
-        // For example, you can get the user's credentials based on the user id.
-    }
-
-}
-
 // xxx.model.ts
 @model()
 export class ManagerCredential extends BasicCredentialEntity {
@@ -72,8 +54,6 @@ Step 2: Install Component
 
 ```ts
 // application.ts
-this.bind(CredentialAuthBindings.DEFINITION).to(Definition);
-this.bind(CredentialAuthBindings.CREDENTIAL_REPOSITORY).toClass(CredentialRepository);
 this.component(CredentialAuthComponent);
 ```
 
@@ -90,7 +70,7 @@ export class DefaultSequence implements SequenceHandler {
     async handle(context: RequestContext) {
 
         // do credential authentication here
-        const report: ExpectFunctionReport | undefined = await (await this.expectFunction())(id, statusId, sequenceMetaData);
+        const report: ExpectFunctionReport | undefined = await (await this.expectFunction())(id, sequenceMetaData);
 
         // Now you can do somthing with `report` ...
         // Example 1: Check the report, throw an exception if the authentication fails

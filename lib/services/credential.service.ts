@@ -2,66 +2,24 @@ import { CredentialModel } from "../types/credential.type";
 import { inject } from "@loopback/context";
 import { CredentialAuthBindings } from "../binding";
 import NodeCache from "node-cache";
-import { Definition, CredentialCached, PropType, ExpectFunctionReport } from "../type";
-import { v4 as uuidv4 } from 'uuid';
+import { CredentialCached, PropType, ExpectFunctionReport } from "../type";
 import { CredentialAuthSpec } from "../types/credential-auth.type";
 import _ from "lodash";
-import { BasicCredentialRepository } from "../repositories/basic-credential.repository";
 
 export class CredentialService {
 
     constructor(
-        @inject(CredentialAuthBindings.DEFINITION)
-        private readonly definition: Definition,
-        @inject(CredentialAuthBindings.CREDENTIAL_REPOSITORY)
-        private readonly credentialRepository: BasicCredentialRepository,
         @inject(CredentialAuthBindings.NODE_CACHE)
-        private readonly nodeCache: NodeCache,
+        private readonly nodeCache: NodeCache
     ) { }
 
     public async getCredentials(
-        id: PropType<CredentialCached, 'id'>,
-        statusId: string,
-        sequenceData?: any
-    ): Promise<GetCredentialsResult> {
-        // $ init
-        let report: GetCredentialsResult = {
-            credentials: [],
-            source: 'UNDEFINED',
-            statusId
-        };
-        // $ find credentials from cache
-        if (
-            this.definition.credentialSource === 'CACHE' ||
-            this.definition.credentialSource === 'CACHE_THEN_DB'
-        ) {
-            const cachedData = this.nodeCache.get<CredentialCached>(`${id}`);
-            if (cachedData && cachedData.statusId === statusId) {
-                report.credentials = Array.isArray(cachedData.credentials) ? cachedData.credentials : [];
-                report.source = 'CACHE';
-            }
-        }
-        // $ find credentials from db
-        if (
-            this.definition.credentialSource === 'DB' ||
-            (report.source === undefined && this.definition.credentialSource === 'CACHE_THEN_DB')
-        ) {
-            if (this.credentialRepository && typeof this.credentialRepository.findCredentials === 'function') {
-                const findCredentialsResult = await this.credentialRepository.findCredentials(id, sequenceData);
-                if (findCredentialsResult && Array.isArray(findCredentialsResult)) {
-                    report.credentials = findCredentialsResult;
-                    report.source = 'DB';
-                    // store in cache
-                    this.nodeCache.set(`${id}`, {
-                        id: `${id}`,
-                        statusId: uuidv4(),
-                        cers: findCredentialsResult
-                    })
-                }
-            }
-        }
-        // $ return
-        return report;
+        id: PropType<CredentialCached, 'id'>
+    ): Promise<Array<CredentialModel>> {
+        let credentials: Array<CredentialModel> = [];
+        const cachedData = this.nodeCache.get<CredentialCached>(`${id}`);
+        if (cachedData && Array.isArray(cachedData!.credentials)) credentials = cachedData.credentials;
+        return credentials;
     }
 
     public expect(
@@ -74,11 +32,9 @@ export class CredentialService {
             overview: {
                 passedSituations: [],
                 unpassedSituations: [],
-                ownedCredentials: [],
-                credentialSource: 'UNDEFINED'
+                ownedCredentials: []
             },
             details: {},
-            statusId: undefined,
             isMetadataExists: false,
             isOptional: _.get(credentialAuthMetadata, 'options.optional', false)
         };
@@ -188,10 +144,4 @@ export class CredentialService {
         return report;
     }
 
-}
-
-type GetCredentialsResult = {
-    credentials: Array<CredentialModel>;
-    source: 'DB' | 'CACHE' | 'UNDEFINED';
-    statusId: string;
 }

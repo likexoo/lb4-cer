@@ -1,10 +1,9 @@
 import { BindingKey } from '@loopback/context';
 import NodeCache = require('node-cache');
-import { ExpectFunction, Definition, UpdateFunction } from './type';
+import { ExpectFunction, UpdateFunction } from './type';
 import { CredentialCodeSpec, CredentialPointSpec, CredentialRelevanceSpec } from './types/credential.type';
 import { CredentialAuthSpec } from './types/credential-auth.type';
 import { CredentialService } from './services/credential.service';
-import { CredentialRepository } from '../__tests__/fixtures/default-application/repositories/credential.repository';
 
 export const CredentialAuthBindings = {
     // metadatas
@@ -18,7 +17,5 @@ export const CredentialAuthBindings = {
     EXPECT_FUNCTION: BindingKey.create<ExpectFunction>('module.credentialAuth.expectFunction'),
     UPDATE_FUNCTION: BindingKey.create<UpdateFunction>('module.credentialAuth.updateFunction'),
     // objects
-    DEFINITION: BindingKey.create<Definition>('module.credentialAuth.definition'),
-    NODE_CACHE: BindingKey.create<NodeCache>('module.credentialAuth.nodeCache'),
-    CREDENTIAL_REPOSITORY: BindingKey.create<CredentialRepository>('module.credentialAuth.credentialRepository')
+    NODE_CACHE: BindingKey.create<NodeCache>('module.credentialAuth.nodeCache')
 };

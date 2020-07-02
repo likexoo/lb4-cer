@@ -8,4 +8,3 @@ export * from './lib/types/credential-auth.type';
 export * from './lib/types/credential.type';
 export * from './lib/type';
 export * from './lib/models/basic-credential.entity';
-export * from './lib/repositories/basic-credential.repository';

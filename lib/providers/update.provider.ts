@@ -4,7 +4,6 @@ import NodeCache = require('node-cache');
 import { CredentialAuthBindings } from '../binding';
 import { UpdateFunction, CredentialCached } from '../type';
 import { CredentialModel } from '../types/credential.type';
-import { v4 as uuidv4 } from 'uuid';
 
 export class UpdateFunctionProvider {
 
@@ -20,17 +19,14 @@ export class UpdateFunctionProvider {
     async action(
         id: string | ObjectId,
         credentials?: Array<CredentialModel>
-    ): Promise<string> {
-        const statusId = uuidv4();
+    ): Promise<void> {
         this.nodeCache.set(
             `${id}`,
             {
                 id: `${id}`,
-                statusId: statusId,
                 credentials: credentials
             } as CredentialCached
         );
-        return statusId;
     }
 
 }
