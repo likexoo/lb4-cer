@@ -11,7 +11,7 @@ export type Definition = {
 export type UpdateFunction = (
     id: string | ObjectId,
     credentials: Array<CredentialModel>
-) => Promise<void>;
+) => Promise<string>;
 
 export type ExpectFunction = (
     id: string | ObjectId,
@@ -37,7 +37,7 @@ export type ExpectFunctionReport = {
 export type SingleExpectReport = {
     errors: Array<{ message: string; details: AnyObject; }>;
     passed: boolean;
-    relevances: Array<AnyObject>;
+    relevances: Array<MetadataReport<AnyObject>>;
 };
 
 export type CredentialCached = {
