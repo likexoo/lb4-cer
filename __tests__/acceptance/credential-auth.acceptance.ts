@@ -47,7 +47,7 @@ describe('@cauth', () => {
 
         const result2 = await client.get('/test2');
         expect(result2).propertyByPath('status').eql(200);
-        
+
     });
 
     it(`@cauth`, async () => {
@@ -251,6 +251,50 @@ describe('@cauth', () => {
         expect(result6).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '0', 'value').eql(`${belongedCompanyId}`);
         expect(result6).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '0').eql(`${ownedCompanies1}`);
         expect(result6).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '1').eql(`${ownedCompanies2}`);
+
+        // having two required credentials (one matched, one not matched)
+
+        await credentialHelper.insertFromNodeCache(
+            'TEST_USER_ID',
+            {
+                id: 'TEST_USER_ID',
+                credentials: [
+                    new ManagerCredential({
+                        _id: new ObjectId(),
+                        updateStaff: false,
+                        level: 0,
+                        belongedCompanyId,
+                        ownedCompanies: [ownedCompanies1, ownedCompanies2]
+                    }),
+                    new ManagerCredential({
+                        _id: new ObjectId(),
+                        updateStaff: true,
+                        level: 4,
+                        belongedCompanyId,
+                        ownedCompanies: [ownedCompanies1, ownedCompanies2]
+                    }),
+                ]
+            } as CredentialCached
+        );
+        spyHelper.upsertSpyFunction(
+            'sequence.beforeInvoke',
+            async () => {
+                return {
+                    id: 'TEST_USER_ID',
+                    sequenceData: {}
+                }
+            }
+        );
+
+        const result7 = await client.get('/test3');
+
+        expect(result7).propertyByPath('status').eql(200);
+        expect(result7).propertyByPath('body', 'report', 'overview', 'passedSituations', 'length').eql(1);
+        expect(result7).propertyByPath('body', 'report', 'details', 'situation0', 'passed').eql(true);
+        expect(result7).propertyByPath('body', 'report', 'details', 'situation1', 'passed').eql(false);
+        expect(result7).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '0', 'value').eql(`${belongedCompanyId}`);
+        expect(result7).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '0').eql(`${ownedCompanies1}`);
+        expect(result7).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '1').eql(`${ownedCompanies2}`);
 
     });
 

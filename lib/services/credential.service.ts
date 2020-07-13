@@ -53,10 +53,10 @@ export class CredentialService {
                 Object.keys(situationObject.credentials).forEach((credentialModelCode: string) => {
                     // init
                     const credentialModelObject = _.get(situationObject, `credentials.${credentialModelCode}`) || {};
-                    // try to find cer in owned cers
-                    const index = ownedCredentials.findIndex(t => _.get(t.getCode(), 'metadata.val') === credentialModelCode);
+                    // try to find all matched cres in owned cres
+                    let matchCredentials: Array<CredentialModel> = ownedCredentials.filter(t => _.get(t.getCode(), 'metadata.val') === credentialModelCode);
                     // if cer not found
-                    if (index === -1) {
+                    if (!matchCredentials || matchCredentials.length === 0) {
                         report.details[situation].passed = false;
                         report.details[situation].errors.push({
                             message: `Missing required credential ${credentialModelCode}`,
@@ -64,54 +64,31 @@ export class CredentialService {
                         });
                         return;
                     }
-                    // get target cer entity
-                    const targetOwnedCredential: CredentialModel = ownedCredentials[index];
-                    // iterate over all contains
-                    Object.keys(credentialModelObject).forEach((credentialPointCode: string) => {
-                        // if checker is boolean
-                        if (typeof credentialModelObject[credentialPointCode] === 'boolean') {
-                            // init
-                            const credentialPointMetadataReport = targetOwnedCredential.findPoint(credentialPointCode);
-                            // potint not found
-                            if (!credentialPointMetadataReport) {
-                                report.details[situation].passed = false;
-                                report.details[situation].errors.push({
-                                    message: `Credential point not found`,
-                                    details: { credentialModelCode, credentialPointCode }
-                                });
-                            }
-                            // potint found but authentication failed
-                            else if (credentialPointMetadataReport.value !== credentialModelObject[credentialPointCode]) {
-                                report.details[situation].passed = false;
-                                report.details[situation].errors.push({
-                                    message: _.get(credentialPointMetadataReport, 'metadata.options.message') || `Credential point authentication failed`,
-                                    details: {
-                                        credentialModelCode, credentialPointCode,
-                                        credentialPointKey: credentialPointMetadataReport.key,
-                                        credentialPointValue: credentialPointMetadataReport.value
-                                    }
-                                });
-                            }
-                            return;
-                        }
-                        // if checker is function
-                        else if (typeof credentialModelObject[credentialPointCode] === 'function') {
-                            // init
-                            const credentialPointMetadataReport = targetOwnedCredential.findPoint(credentialPointCode)
-                            // potint not found
-                            if (!credentialPointMetadataReport) {
-                                report.details[situation].passed = false;
-                                report.details[situation].errors.push({
-                                    message: `Credential point not found`,
-                                    details: { credentialModelCode, credentialPointCode }
-                                });
-                            }
-                            // potint found
-                            else {
-                                const result: boolean = (credentialModelObject[credentialPointCode] as any)(credentialPointMetadataReport.value, sequenceData);
-                                if (result !== true) {
-                                    report.details[situation].passed = false;
-                                    report.details[situation].errors.push({
+                    // iterate over all matched credentials
+                    let mtchedCresPassedCres: Array<CredentialModel> = [];
+                    let matchedCresUnPassedCres: Array<CredentialModel> = [];
+                    let matchedCresUnPassedCresErrors: Array<any> = [];
+                    matchCredentials.forEach((matchCredential: CredentialModel) => {
+                        // get target cer entity
+                        const targetOwnedCredential: CredentialModel = matchCredential;
+                        // iterate over all contains
+                        Object.keys(credentialModelObject).forEach((credentialPointCode: string) => {
+                            // if checker is boolean
+                            if (typeof credentialModelObject[credentialPointCode] === 'boolean') {
+                                // init
+                                const credentialPointMetadataReport = targetOwnedCredential.findPoint(credentialPointCode);
+                                // potint not found
+                                if (!credentialPointMetadataReport) {
+                                    matchedCresUnPassedCres.push(credentialModelObject[credentialPointCode]);
+                                    matchedCresUnPassedCresErrors.push({
+                                        message: `Credential point not found`,
+                                        details: { credentialModelCode, credentialPointCode }
+                                    });
+                                }
+                                // potint found but authentication failed
+                                else if (credentialPointMetadataReport.value !== credentialModelObject[credentialPointCode]) {
+                                    matchedCresUnPassedCres.push(credentialModelObject[credentialPointCode]);
+                                    matchedCresUnPassedCresErrors.push({
                                         message: _.get(credentialPointMetadataReport, 'metadata.options.message') || `Credential point authentication failed`,
                                         details: {
                                             credentialModelCode, credentialPointCode,
@@ -120,12 +97,51 @@ export class CredentialService {
                                         }
                                     });
                                 }
+                                // passed
+                                else {
+                                    mtchedCresPassedCres.push(credentialModelObject[credentialPointCode]);
+                                }
                             }
-                            return;
-                        }
+                            // if checker is function
+                            else if (typeof credentialModelObject[credentialPointCode] === 'function') {
+                                // init
+                                const credentialPointMetadataReport = targetOwnedCredential.findPoint(credentialPointCode)
+                                // potint not found
+                                if (!credentialPointMetadataReport) {
+                                    matchedCresUnPassedCres.push(credentialModelObject[credentialPointCode]);
+                                    matchedCresUnPassedCresErrors.push({
+                                        message: `Credential point not found`,
+                                        details: { credentialModelCode, credentialPointCode }
+                                    });
+                                }
+                                // potint found
+                                else {
+                                    const result: boolean = (credentialModelObject[credentialPointCode] as any)(credentialPointMetadataReport.value, sequenceData);
+                                    if (result !== true) {
+                                        matchedCresUnPassedCres.push(credentialModelObject[credentialPointCode]);
+                                        matchedCresUnPassedCresErrors.push({
+                                            message: _.get(credentialPointMetadataReport, 'metadata.options.message') || `Credential point authentication failed`,
+                                            details: {
+                                                credentialModelCode, credentialPointCode,
+                                                credentialPointKey: credentialPointMetadataReport.key,
+                                                credentialPointValue: credentialPointMetadataReport.value
+                                            }
+                                        });
+                                    }
+                                    // passed
+                                    else {
+                                        mtchedCresPassedCres.push(credentialModelObject[credentialPointCode]);
+                                    }
+                                }
+                            }
+                        });
+                        // add related
+                        relevances.push(...(targetOwnedCredential.getRelevances() || []));
                     });
-                    // add related
-                    relevances.push(...(targetOwnedCredential.getRelevances() || []));
+                    // check
+                    if (mtchedCresPassedCres.length === 0) {
+                        report.details[situation].passed = false;
+                    }
                 });
             }
             // add relateds
