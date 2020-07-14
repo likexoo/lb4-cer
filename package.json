@@ -1,6 +1,6 @@
 {
     "name": "lb4-credential-auth",
-    "version": "1.1.10",
+    "version": "1.1.11",
     "description": "A LoopBack4 component for credential authentication support.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",

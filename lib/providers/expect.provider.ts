@@ -5,6 +5,7 @@ import { ExpectFunction, ExpectFunctionReport } from '../type';
 import { CredentialAuthSpec } from '../types/credential-auth.type';
 import { ObjectId } from 'bson';
 import { CredentialService } from '../services/credential.service';
+import _ from 'lodash';
 
 export class ExpectFunctionProvider implements Provider<ExpectFunction> {
 
@@ -26,9 +27,18 @@ export class ExpectFunctionProvider implements Provider<ExpectFunction> {
 
     async action(
         id: string | ObjectId,
-        sequenceData?: any
+        sequenceData?: any,
+        metadata?: CredentialAuthSpec
     ): Promise<ExpectFunctionReport> {
-        const metadata: CredentialAuthSpec | undefined = MetadataInspector.getMethodMetadata(CredentialAuthBindings.CREDENTIAL_AUTH_METADATA, this.controllerClass.prototype, this.methodName);
+        if (!metadata) {
+            try {
+                metadata = MetadataInspector.getMethodMetadata(
+                    CredentialAuthBindings.CREDENTIAL_AUTH_METADATA,
+                    this.controllerClass.prototype,
+                    this.methodName
+                );
+            } catch (error) { }
+        }
         const cachedCredentials = await this.credentialService.getCredentials(id);
         let report: ExpectFunctionReport = this.credentialService.expect(cachedCredentials, metadata!, sequenceData);
         return report;
