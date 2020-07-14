@@ -296,6 +296,43 @@ describe('@cauth', () => {
         expect(result7).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '0').eql(`${ownedCompanies1}`);
         expect(result7).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '1').eql(`${ownedCompanies2}`);
 
+        // having the required credentials (onw with none contains)
+
+        await credentialHelper.insertFromNodeCache(
+            'TEST_USER_ID',
+            {
+                id: 'TEST_USER_ID',
+                credentials: [
+                    new ManagerCredential({
+                        _id: new ObjectId(),
+                        updateStaff: true,
+                        level: 4,
+                        belongedCompanyId,
+                        ownedCompanies: [ownedCompanies1, ownedCompanies2]
+                    })
+                ]
+            } as CredentialCached
+        );
+        spyHelper.upsertSpyFunction(
+            'sequence.beforeInvoke',
+            async () => {
+                return {
+                    id: 'TEST_USER_ID',
+                    sequenceData: {}
+                }
+            }
+        );
+
+        const result8 = await client.get('/test5');
+
+        expect(result8).propertyByPath('status').eql(200);
+        expect(result8).propertyByPath('body', 'report', 'overview', 'passedSituations', 'length').eql(1);
+        expect(result8).propertyByPath('body', 'report', 'details', 'situation0', 'passed').eql(true);
+        expect(result8).propertyByPath('body', 'report', 'details', 'situation1', 'passed').eql(false);
+        expect(result8).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '0', 'value').eql(`${belongedCompanyId}`);
+        expect(result8).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '0').eql(`${ownedCompanies1}`);
+        expect(result8).propertyByPath('body', 'report', 'details', 'situation0', 'relevances', '1', 'value', '1').eql(`${ownedCompanies2}`);
+
     });
 
 });

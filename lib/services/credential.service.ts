@@ -71,6 +71,10 @@ export class CredentialService {
                     matchCredentials.forEach((matchCredential: CredentialModel) => {
                         // get target cer entity
                         const targetOwnedCredential: CredentialModel = matchCredential;
+                        // if no need check contains
+                        if (Object.keys(credentialModelObject).length === 0) {
+                            mtchedCresPassedCres.push(credentialModelObject);
+                        }
                         // iterate over all contains
                         Object.keys(credentialModelObject).forEach((credentialPointCode: string) => {
                             // if checker is boolean
@@ -139,9 +143,7 @@ export class CredentialService {
                         relevances.push(...(targetOwnedCredential.getRelevances() || []));
                     });
                     // check
-                    if (mtchedCresPassedCres.length === 0) {
-                        report.details[situation].passed = false;
-                    }
+                    if (mtchedCresPassedCres.length === 0) report.details[situation].passed = false;
                 });
             }
             // add relateds

@@ -70,4 +70,25 @@ export class ExpectFunctionController {
         return 'ok';
     }
 
+    @cauth({
+        situations: {
+            situation0: {
+                credentials: {
+                    'MANAGER': {}
+                }
+            },
+            situation1: {
+                credentials: {
+                    'ADMIN': {
+                        UPDATE_EVERYTHING: true
+                    }
+                }
+            }
+        }
+    })
+    @get('/test5')
+    async test5(): Promise<string> {
+        return 'ok';
+    }
+
 }
